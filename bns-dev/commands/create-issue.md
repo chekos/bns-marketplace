@@ -1,47 +1,71 @@
 ---
+allowed-tools: [Bash(gh*), Read, WebSearch, Grep, Glob, Task]
 description: Create well-structured GitHub issues following best practices
 ---
 
-You are an AI assistant tasked with creating well-structured GitHub issues for feature requests, bug reports, or improvement ideas. Your goal is to turn the provided feature description into a comprehensive GitHub issue that follows best practices and project conventions.
+Create a GitHub issue from the following description:
 
-First, you will be given a feature description and a repository URL. Here they are:
+<feature_description>
+#$ARGUMENTS
+</feature_description>
 
-<feature_description> #$ARGUMENTS </feature_description>
+If no description provided, ask the user for the feature request or bug report details.
 
-Follow these steps to complete the task, make a todo list and think ultrahard:
+## Phase 1: Research
 
-1. Research the repository:
+Conduct comprehensive research to ensure the issue follows best practices:
 
-   - Visit the provided repo_url and examine the repository's structure, existing issues, and documentation.
-   - Look for any CONTRIBUTING.md, ISSUE_TEMPLATE.md, or similar files that might contain guidelines for creating issues.
-   - Note the project's coding style, naming conventions, and any specific requirements for submitting issues.
+1. **Repository research**:
+   - Check for CONTRIBUTING.md, .github/ISSUE_TEMPLATE.md, or similar guidelines
+   - Review 2-3 recent issues to understand format and conventions
+   - Note project-specific coding style, naming conventions, and requirements
 
-2. Research best practices:
+2. **Best practices research**:
+   - Search for current best practices in writing GitHub issues (clarity, completeness, actionability)
+   - Look for well-written examples in popular open-source projects for inspiration
+   - Research best practices specific to the feature/bug topic
+   - If available, use specialized research agents to gather latest approaches and patterns
 
-   - Search for current best practices in writing GitHub issues, focusing on clarity, completeness, and actionability.
-   - Look for examples of well-written issues in popular open-source projects for inspiration.
-   - Search the web for best practices on the topics handles
-   - Use context7 mcp to get the latest information about the project and the user request.
+3. **Context gathering**:
+   - Identify any reference links (featurebase, external sources) that inspired this request
+   - Note any local files or repositories that should be referenced
 
-3. Present a plan:
+## Phase 2: Draft the Issue
 
-   - Based on your research, outline a plan for creating the GitHub issue.
-   - Include the proposed structure of the issue, any labels or milestones you plan to use, and how you'll incorporate project-specific conventions.
-   - Present this plan in <plan> tags.
-   - Inlcude the reference link to faeturebase or any opther link that has the source of the user request
-   - Please ensure any references to local files with line numbers or GitHub repositories are included at the bottom of the GitHub issue for future reference.
+Based on your research, create a comprehensive issue:
 
-4. Create the GitHub issue:
+- **Title**: Clear, concise (50 chars or less)
+- **Description**:
+  - Problem statement or feature request summary
+  - Current behavior (for bugs) or motivation (for features)
+  - Expected behavior or desired outcome
+  - Acceptance criteria (bulleted list)
+  - Additional context, screenshots, or resources
+  - References (local files with line numbers, external links) at bottom
 
-   - Once the plan is approved, draft the GitHub issue content.
-   - Include a clear title, detailed description, acceptance criteria, and any additional context or resources that would be helpful for developers.
-   - Use appropriate formatting (e.g., Markdown) to enhance readability.
-   - Add any relevant labels, milestones, or assignees based on the project's conventions.
+## Phase 3: Determine Appropriate Label
 
-5. Final output:
-   - Present the complete GitHub issue content in <github_issue> tags.
-   - Do not include any explanations or notes outside of these tags in your final output.
+Retrieve available labels in the repository:
 
-Remember to think carefully about the feature description and how to best present it as a GitHub issue. Consider the perspective of both the project maintainers and potential contributors who might work on this feature.
+```bash
+gh label list
+```
 
-Your final output should consist of only the content within the <github_issue> tags, ready to be copied and pasted directly into GitHub. Make sure to use the GitHub CLI `gh issue create` to create the actual issue after you generate. Assign either the label `bug` or `enhancement` based on the nature of the issue.
+Based on the available labels and the nature of the issue, determine the most appropriate label(s). Common labels include `bug`, `enhancement`, but use project-specific labels when they better describe the issue.
+
+## Phase 4: Create the Issue
+
+1. Present the draft issue content for approval (including title, body, and selected label(s))
+2. Once approved, create using:
+   ```bash
+   gh issue create --title "TITLE" --body "BODY" --label "LABEL"
+   ```
+3. Display the created issue URL
+
+## Error Handling
+
+If issue creation fails, check:
+- Repository exists and is accessible
+- You have permission to create issues
+- gh CLI is authenticated (`gh auth status`)
+- Selected labels exist in the repository (verify with `gh label list`)
