@@ -1,0 +1,25 @@
+{
+    "name": "bns-marketplace",
+    "owner": {
+        "name": "chekos",
+        "url": "https://github.com/chekos"
+    },
+    "repository": "https://github.com/chekos/bns-marketplace",
+    "plugins": [
+        {
+            "name": "bns-dev",
+            "source": "./bns-dev",
+            "description": "An opinionated plugin for development tasks as done in brasas&nube.",
+            "version": "0.1.0",
+            "author": {
+                "name": "chekos",
+                "url": "https://github.com/chekos"
+            },
+            "homepage": "https://github.com/chekos/bns-marketplace",
+            "tags": [
+                "development",
+                "productivity"
+            ]
+        }
+    ]
+}

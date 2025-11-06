@@ -1,0 +1,8 @@
+{
+    "name": "bns-dev",
+    "description": "An opinionated plugin for development tasks as done in brasas&nube.",
+    "version": "0.1.0",
+    "author": {
+        "name": "chekos"
+    }
+}
