@@ -20,6 +20,103 @@
                 "development",
                 "productivity"
             ]
+        },
+        {
+            "name": "tdd-editor",
+            "source": "./tdd-editor",
+            "description": "Editor-in-Chief for tacosdedatos - content direction, quality assurance, and editorial leadership.",
+            "version": "0.1.0",
+            "author": {
+                "name": "chekos",
+                "url": "https://github.com/chekos"
+            },
+            "homepage": "https://github.com/chekos/bns-marketplace",
+            "tags": [
+                "editorial",
+                "content",
+                "writing"
+            ]
+        },
+        {
+            "name": "tdd-design",
+            "source": "./tdd-design",
+            "description": "Chief of Design for tacosdedatos - visual identity, AI image generation, and brand consistency.",
+            "version": "0.1.0",
+            "author": {
+                "name": "chekos",
+                "url": "https://github.com/chekos"
+            },
+            "homepage": "https://github.com/chekos/bns-marketplace",
+            "tags": [
+                "design",
+                "visual",
+                "branding"
+            ]
+        },
+        {
+            "name": "tdd-tech",
+            "source": "./tdd-tech",
+            "description": "CTO for tacosdedatos - technical quality, code review, tutorials, and developer experience.",
+            "version": "0.1.0",
+            "author": {
+                "name": "chekos",
+                "url": "https://github.com/chekos"
+            },
+            "homepage": "https://github.com/chekos/bns-marketplace",
+            "tags": [
+                "technical",
+                "code-review",
+                "tutorials"
+            ]
+        },
+        {
+            "name": "tdd-growth",
+            "source": "./tdd-growth",
+            "description": "CGO for tacosdedatos - SEO, social media, newsletter growth, and analytics.",
+            "version": "0.1.0",
+            "author": {
+                "name": "chekos",
+                "url": "https://github.com/chekos"
+            },
+            "homepage": "https://github.com/chekos/bns-marketplace",
+            "tags": [
+                "growth",
+                "seo",
+                "social-media",
+                "analytics"
+            ]
+        },
+        {
+            "name": "tdd-revenue",
+            "source": "./tdd-revenue",
+            "description": "CRO for tacosdedatos - revenue strategy, sponsorships, products, and monetization.",
+            "version": "0.1.0",
+            "author": {
+                "name": "chekos",
+                "url": "https://github.com/chekos"
+            },
+            "homepage": "https://github.com/chekos/bns-marketplace",
+            "tags": [
+                "revenue",
+                "sponsorships",
+                "monetization"
+            ]
+        },
+        {
+            "name": "tdd-community",
+            "source": "./tdd-community",
+            "description": "Community Director for tacosdedatos - member experience, events, and community health.",
+            "version": "0.1.0",
+            "author": {
+                "name": "chekos",
+                "url": "https://github.com/chekos"
+            },
+            "homepage": "https://github.com/chekos/bns-marketplace",
+            "tags": [
+                "community",
+                "events",
+                "moderation"
+            ]
         }
     ]
 }

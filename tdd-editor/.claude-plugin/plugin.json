@@ -1,0 +1,8 @@
+{
+    "name": "tdd-editor",
+    "description": "Editor-in-Chief for tacosdedatos - content direction, quality assurance, and editorial leadership.",
+    "version": "0.1.0",
+    "author": {
+        "name": "chekos"
+    }
+}
