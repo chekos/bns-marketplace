@@ -25,7 +25,7 @@
             "name": "tdd-editor",
             "source": "./tdd-editor",
             "description": "Editor-in-Chief for tacosdedatos - content direction, quality assurance, and editorial leadership.",
-            "version": "0.2.0",
+            "version": "0.3.0",
             "author": {
                 "name": "chekos",
                 "url": "https://github.com/chekos"
@@ -35,13 +35,20 @@
                 "editorial",
                 "content",
                 "writing"
+            ],
+            "skills": [
+                "./skills/every-style-editor",
+                "./skills/fact-checker",
+                "./skills/image-prompt-writer",
+                "./skills/tacosdedatos-editor",
+                "./skills/tacosdedatos-writer"
             ]
         },
         {
             "name": "tdd-design",
             "source": "./tdd-design",
             "description": "Chief of Design for tacosdedatos - visual identity, AI image generation, and brand consistency.",
-            "version": "0.2.0",
+            "version": "0.3.0",
             "author": {
                 "name": "chekos",
                 "url": "https://github.com/chekos"
@@ -51,13 +58,20 @@
                 "design",
                 "visual",
                 "branding"
+            ],
+            "skills": [
+                "./skills/design-guidelines",
+                "./skills/image-generation",
+                "./skills/image-prompt-writer",
+                "./skills/image-validator",
+                "./skills/tacosdedatos-illustrator"
             ]
         },
         {
             "name": "tdd-tech",
             "source": "./tdd-tech",
             "description": "CTO for tacosdedatos - technical quality, code review, tutorials, and developer experience.",
-            "version": "0.2.0",
+            "version": "0.3.0",
             "author": {
                 "name": "chekos",
                 "url": "https://github.com/chekos"
@@ -67,13 +81,20 @@
                 "technical",
                 "code-review",
                 "tutorials"
+            ],
+            "skills": [
+                "./skills/code-standards",
+                "./skills/data-engineering",
+                "./skills/devrel-practices",
+                "./skills/docs-as-code",
+                "./skills/technical-writing"
             ]
         },
         {
             "name": "tdd-growth",
             "source": "./tdd-growth",
             "description": "CGO for tacosdedatos - SEO, social media, newsletter growth, and analytics.",
-            "version": "0.2.0",
+            "version": "0.3.0",
             "author": {
                 "name": "chekos",
                 "url": "https://github.com/chekos"
@@ -84,13 +105,34 @@
                 "seo",
                 "social-media",
                 "analytics"
+            ],
+            "skills": [
+                "./skills/aeo-optimizer",
+                "./skills/analytics-frameworks",
+                "./skills/bluesky-growth-strategy",
+                "./skills/bluesky-post-crafter",
+                "./skills/growth-tactics",
+                "./skills/instagram-post-crafter",
+                "./skills/instagram-stories-crafter",
+                "./skills/linkedin-content-strategy",
+                "./skills/linkedin-post-crafter",
+                "./skills/partnership-finder",
+                "./skills/referral-program-designer",
+                "./skills/seo-guidelines",
+                "./skills/social-strategy",
+                "./skills/subject-line-optimizer",
+                "./skills/substack-growth-strategy",
+                "./skills/substack-post-crafter",
+                "./skills/tacosdedatos-seo",
+                "./skills/tweet-crafter",
+                "./skills/twitter-campaign-planner"
             ]
         },
         {
             "name": "tdd-revenue",
             "source": "./tdd-revenue",
             "description": "CRO for tacosdedatos - revenue strategy, sponsorships, products, and monetization.",
-            "version": "0.2.0",
+            "version": "0.3.0",
             "author": {
                 "name": "chekos",
                 "url": "https://github.com/chekos"
@@ -100,13 +142,19 @@
                 "revenue",
                 "sponsorships",
                 "monetization"
+            ],
+            "skills": [
+                "./skills/financial-models",
+                "./skills/product-development",
+                "./skills/sales-templates",
+                "./skills/sponsorship-playbook"
             ]
         },
         {
             "name": "tdd-community",
             "source": "./tdd-community",
             "description": "Community Director for tacosdedatos - member experience, events, and community health.",
-            "version": "0.2.0",
+            "version": "0.3.0",
             "author": {
                 "name": "chekos",
                 "url": "https://github.com/chekos"
@@ -116,6 +164,12 @@
                 "community",
                 "events",
                 "moderation"
+            ],
+            "skills": [
+                "./skills/community-guidelines",
+                "./skills/event-playbook",
+                "./skills/member-experience",
+                "./skills/moderation-rules"
             ]
         }
     ]
