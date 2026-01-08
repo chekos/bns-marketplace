@@ -25,7 +25,7 @@
             "name": "tdd-editor",
             "source": "./tdd-editor",
             "description": "Editor-in-Chief for tacosdedatos - content direction, quality assurance, and editorial leadership.",
-            "version": "0.1.0",
+            "version": "0.2.0",
             "author": {
                 "name": "chekos",
                 "url": "https://github.com/chekos"
@@ -41,7 +41,7 @@
             "name": "tdd-design",
             "source": "./tdd-design",
             "description": "Chief of Design for tacosdedatos - visual identity, AI image generation, and brand consistency.",
-            "version": "0.1.0",
+            "version": "0.2.0",
             "author": {
                 "name": "chekos",
                 "url": "https://github.com/chekos"
@@ -57,7 +57,7 @@
             "name": "tdd-tech",
             "source": "./tdd-tech",
             "description": "CTO for tacosdedatos - technical quality, code review, tutorials, and developer experience.",
-            "version": "0.1.0",
+            "version": "0.2.0",
             "author": {
                 "name": "chekos",
                 "url": "https://github.com/chekos"
@@ -73,7 +73,7 @@
             "name": "tdd-growth",
             "source": "./tdd-growth",
             "description": "CGO for tacosdedatos - SEO, social media, newsletter growth, and analytics.",
-            "version": "0.1.0",
+            "version": "0.2.0",
             "author": {
                 "name": "chekos",
                 "url": "https://github.com/chekos"
@@ -90,7 +90,7 @@
             "name": "tdd-revenue",
             "source": "./tdd-revenue",
             "description": "CRO for tacosdedatos - revenue strategy, sponsorships, products, and monetization.",
-            "version": "0.1.0",
+            "version": "0.2.0",
             "author": {
                 "name": "chekos",
                 "url": "https://github.com/chekos"
@@ -106,7 +106,7 @@
             "name": "tdd-community",
             "source": "./tdd-community",
             "description": "Community Director for tacosdedatos - member experience, events, and community health.",
-            "version": "0.1.0",
+            "version": "0.2.0",
             "author": {
                 "name": "chekos",
                 "url": "https://github.com/chekos"
