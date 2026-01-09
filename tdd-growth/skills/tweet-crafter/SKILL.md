@@ -20,15 +20,15 @@ Priority ranking factors:
 ## Format Selection
 
 ```
-Thread: Listicles, step-by-step tutorials, "X cosas que aprendí"
-Long-form: Essays, narratives, opinion pieces, deep analysis
+Long-form (preferred): Tutorials, essays, deep analysis, "X cosas que aprendí", narratives
+Thread: Only when content naturally breaks into discrete numbered points
 
 Performance benchmark:
-- Long-form: ~10K impressions
-- Thread: ~8K impressions, but 60% more profile visits
+- Long-form articles: Higher engagement, better reach, preferred by algorithm
+- Threads: Lower performance, use sparingly for variety
 ```
 
-Choose based on content structure, not impressions alone.
+**Default to long-form articles.** Threads are no longer the go-to format for educational content. Long-form articles consistently outperform threads on reach and engagement.
 
 ## Link Posts (NEW — October 2025)
 
@@ -53,7 +53,7 @@ Per Elon: "posting a link with almost no description will get weak distribution"
 [Optional: 1 hashtag max]
 ```
 
-### Thread Format
+### Thread Format (Use Sparingly)
 
 ```
 1/🧵 [Standalone hook that works even without thread]
@@ -69,6 +69,7 @@ Thread rules:
 - 5-15 tweets optimal
 - Self-reply immediately after posting (signals thread to algorithm)
 - Hook must work standalone — most people only see tweet 1
+- **Consider converting to long-form article instead** — better performance
 
 ### Long-Form Post (Premium)
 
@@ -149,7 +150,7 @@ Esto y más en el nuevo tacosdedatos:
 
 ## Timing
 
-- Best times: 9-11 AM, 7-9 PM (Mexico City timezone)
+- Best times: 9-11 AM, 7-9 PM (PST)
 - Best days: Tuesday-Thursday
 - Post when followers are online (check analytics)
 

@@ -26,25 +26,27 @@ description: |
 
 ### Growth Mode
 - 3-5 posts/day
-- 2-3 threads/week
+- 2-3 long-form articles/week (Premium) — highest performing format
 - 50+ meaningful replies/day ("reply guy" strategy)
-- 1 long-form post/week (if Premium)
+- Threads optional for variety (long-form outperforms)
 
 ### Timing
-- Best times: 9-11 AM, 7-9 PM (Mexico City)
+- Best times: 9-11 AM, 7-9 PM (PST)
 - Best days: Tuesday-Thursday
 - Post when followers are online (check analytics)
 
 ## Weekly Content Mix
 
 ```
-Monday: Educational thread or long-form
+Monday: Long-form article (educational deep dive)
 Tuesday: Engagement post (question, poll, hot take)
-Wednesday: Industry insight or data viz
+Wednesday: Long-form article (industry insight or tutorial)
 Thursday: Behind-the-scenes or personal
-Friday: Curated content (share others' work)
+Friday: Curated content (share others' work) or long-form
 Weekend: Light engagement, replies only
 ```
+
+Note: Long-form articles outperform threads. Default to long-form for educational content.
 
 ## Content Pillars for tacosdedatos
 
@@ -78,39 +80,39 @@ Expected Results:
 
 ```markdown
 ## Pre-Launch (Day -3 to -1)
-- Teaser thread about upcoming content
+- Teaser long-form article about upcoming content
 - Behind-the-scenes of writing process
 - Engage heavily in niche conversations
 
 ## Launch Day
-- Morning: Thread with key insights from newsletter
-- Afternoon: Long-form post with different angle
+- Morning: Long-form article with key insights from newsletter
+- Afternoon: Follow-up post with different angle
 - Evening: Link post with compelling caption
 - All day: Reply to every comment within 1 hour
 
 ## Post-Launch (Day +1 to +3)
 - Share reader reactions/quotes
 - Answer questions publicly
-- Create spin-off content from newsletter topics
+- Create spin-off long-form content from newsletter topics
 - Thank engaged followers publicly
 ```
 
-### Thread Series Campaign (4 Weeks)
+### Long-Form Series Campaign (4 Weeks)
 
 ```markdown
 ## Week 1: Establish
 - Day 1: Announce series with hook
-- Day 3: Thread #1 (strongest topic)
+- Day 3: Long-form article #1 (strongest topic)
 - Day 5: Engagement post asking what to cover next
 
 ## Week 2-3: Build
-- 2 threads per week on announced schedule
+- 2-3 long-form articles per week on announced schedule
 - Daily engagement in niche
-- Cross-reference previous threads
+- Cross-reference previous articles
 
 ## Week 4: Close
-- Final thread with series recap
-- CTA to newsletter for "deep dive"
+- Final long-form article with series recap
+- CTA to newsletter for "exclusive content"
 - Thank followers, ask for RT
 ```
 
@@ -129,7 +131,7 @@ Expected Results:
 - Questions that spark discussion
 - Polls on relevant topics
 - Hot takes (thoughtful, not inflammatory)
-- Threads breaking down complex topics
+- Long-form articles breaking down complex topics
 
 ## Success Metrics
 - Reply rate increase

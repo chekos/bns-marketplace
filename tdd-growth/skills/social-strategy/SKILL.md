@@ -52,18 +52,21 @@ In 2024, social media success comes from authentic engagement and platform-nativ
 **Content Strategy:**
 ```
 Best Performing Content Types:
-1. Threads (educational, storytelling)
+1. Long-form articles (educational, deep dives, tutorials)
 2. Quick tips and insights
 3. Hot takes and opinions
 4. Behind-the-scenes content
 5. Engagement bait (questions, polls)
+6. Threads (use sparingly, long-form outperforms)
 
 Avoid:
-- External links in main tweets (algorithm penalty)
 - Generic promotional content
 - Over-hashtagging
 - Automated cross-posts
+- Defaulting to threads when long-form would work better
 ```
+
+Note: Links are no longer penalized (changed October 2025). New in-app browser keeps engagement visible.
 
 **Format Guidelines:**
 ```
@@ -71,14 +74,20 @@ Single Tweet:
 - Max 280 characters, but shorter often performs better
 - 1-2 hashtags maximum
 - Images increase engagement 150%+
-- Keep links in replies, not main tweet
+- Links now OK in main tweet (algorithm no longer penalizes)
 
-Threads:
+Long-form Articles (Premium - PREFERRED):
+- Up to 25,000 characters with formatting
+- First 280 chars show in timeline — front-load the hook
+- Best for tutorials, essays, deep analysis
+- Outperforms threads on reach and engagement
+
+Threads (use sparingly):
 - Hook in first tweet (make it standalone-worthy)
 - 5-15 tweets optimal length
 - Number format: "1/🧵" or "1/"
 - End with a call to action
-- Self-reply immediately after posting
+- Consider long-form article instead for better performance
 ```
 
 **Content Templates:**
