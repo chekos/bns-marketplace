@@ -442,6 +442,10 @@ Use exclamation points sparingly. Seriously! (Unless you're quoting someone.) Us
 
 ### Quotation marks
 
+#### Straight vs. Curly Quotes
+
+Use straight quotation marks (" ") and apostrophes (') instead of curly/smart quotes (" ") and curly apostrophes ('). Curly characters are a common artifact of AI-generated or word-processed text and should be replaced with their straight equivalents: "it's" not "it's", "don't" not "don't".
+
 #### Basic Usage
 
 Spoken text should be placed in double quotation marks (" "). Quotes within quotations should be placed in single quotation marks (' '): "He told me, 'That's a fantastic idea.'" "You may find it hard to prioritize the 'I got problems' meeting at first."
