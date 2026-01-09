@@ -156,7 +156,7 @@ Example for tacosdedatos:
 | Saturday | 11 AM, 5 PM |
 | Sunday | 12-3 PM |
 
-*Times in audience's local timezone (Mexico City for tacosdedatos)*
+*Times in PST*
 
 ### Weekly Cadence
 
