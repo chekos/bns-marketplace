@@ -10,7 +10,7 @@
             "name": "bns-dev",
             "source": "./bns-dev",
             "description": "An opinionated plugin for development tasks as done in brasas&nube.",
-            "version": "0.1.0",
+            "version": "0.1.1",
             "author": {
                 "name": "chekos",
                 "url": "https://github.com/chekos"
