@@ -3,8 +3,8 @@ name: twitter-campaign-planner
 description: |
   Plan multi-week Twitter/X campaigns for newsletter growth, content launches, or audience building.
   Use when creating content calendars, planning thread series, coordinating cross-platform promotion,
-  or designing engagement strategies. Includes posting cadence, "reply guy" tactics, and campaign
-  templates optimized for the December 2025 algorithm.
+  or designing engagement strategies. Includes posting cadence, "reply guy" tactics, author diversity,
+  out-of-network reach strategies, and campaign templates optimized for the January 2026 algorithm.
 ---
 
 # Twitter Campaign Planner Skill
@@ -225,6 +225,110 @@ Avoid these common mistakes:
 - **Link-only posts** — Always add compelling caption/insight
 - **Ignoring replies** — Every reply is an opportunity
 - **Inconsistent schedule** — Algorithm favors reliability
+
+## Author Diversity (Algorithm Signal)
+
+The X algorithm penalizes engagement patterns that appear inauthentic or "echo chamber" behavior:
+
+| Anti-Pattern | Consequence | Solution |
+|--------------|-------------|----------|
+| Same 5-10 accounts daily | Reduced visibility | Rotate engagement targets weekly |
+| Reply bursts | Flagged as spam | Space replies throughout day |
+| Generic replies | Lower quality score | Ensure replies add unique value |
+| Echo chamber engagement | Limited OON reach | Engage across network clusters |
+| Replying to same author repeatedly | Diminished score per interaction | Max 3 replies to same account per day |
+
+**Updated Reply Guy Strategy:**
+- Track accounts engaged with (weekly rotation spreadsheet)
+- Aim for 50+ quality replies across 30+ unique accounts daily
+- Never more than 3 replies to same account per day
+- Mix large accounts (50K+) with peers for balanced authority signals
+- Rotate niches: data viz → Python → Spanish tech → broader tech
+
+## Out-of-Network (OON) Reach Strategy
+
+Out-of-network content (shown to people who don't follow you) receives different algorithmic scoring. To maximize OON reach:
+
+### High OON Potential Content
+1. **Quote Tweets** — Get shown to both your audience and the original author's
+2. **Viral-format Content** — High early engagement signals OON distribution
+3. **Trending Topic Replies** — Reply to trending conversations for exposure
+4. **Premium Status** — 2x OON visibility boost with Premium subscription
+
+### OON Engagement Signals
+| Signal | OON Impact |
+|--------|------------|
+| Reply from large account | Very High |
+| Retweet from large account | High |
+| Quote tweet engagement | High |
+| Trending topic participation | Medium |
+| Profile visits from non-followers | Positive signal |
+
+### Campaign Tactic: OON Expansion Week
+Dedicate one week per month to OON growth:
+- Focus on replying to accounts outside your usual engagement circle
+- Create content specifically designed for shareability
+- Target trending topics in your niche
+- Measure new follower sources
+
+## Troubleshooting
+
+### Shadowban Detection
+
+**Symptoms:**
+- Impressions dropped 50%+ suddenly
+- No engagement from non-followers
+- Replies not appearing in conversations
+- Search visibility gone
+
+**Check tools:**
+- [Shadowban Test Tool](https://hisubway.online/shadowban/)
+- Search your username while logged out
+
+### Recovery Tactics
+
+| Issue | Diagnosis | Action |
+|-------|-----------|--------|
+| Sudden engagement drop | Possible shadowban or algorithm reset | Reduce posting to 1/day, increase engagement, wait 1-2 weeks |
+| Gradual decline | Content fatigue or algorithm shift | Experiment with new formats (video, long-form), refresh content pillars |
+| Low replies, decent likes | Content not prompting discussion | Add questions, hot takes, controversial (but thoughtful) opinions |
+| Low profile visits | Bio not optimized, content not intriguing | Update bio with keywords, improve hooks |
+| Shadowban confirmed | Violated guidelines or spam detection | Stop posting 24-48 hours, then gradually resume with quality content only |
+
+### Algorithm Reset Protocol
+
+If you need to "reset" your algorithm relationship:
+
+```
+Week 1: Engagement Sprint
+- Reduce original posts to 1/day
+- 50+ quality replies daily
+- Zero promotional content
+- Respond to every comment within 30 minutes
+
+Week 2: Quality Over Quantity
+- Increase to 2-3 posts/day
+- Focus on highest-performing formats
+- Continue high engagement
+- Track metrics daily
+
+Week 3+: Gradual Return
+- Return to normal cadence
+- Maintain engagement levels
+- Monitor for sustained improvement
+```
+
+## Algorithm-Aware KPIs
+
+Track these metrics for campaign health:
+
+| Metric | Formula | Benchmark (Good/Great/Excellent) |
+|--------|---------|----------------------------------|
+| Reply Rate | Replies / Impressions × 100 | 0.5% / 1% / 2%+ |
+| Repost Rate | Reposts / Impressions × 100 | 0.3% / 0.5% / 1%+ |
+| Engagement Velocity | Total Engagements / First Hour | Track trend over time |
+| OON Reach % | Non-follower impressions / Total impressions | 30% / 50% / 70%+ |
+| Follower Growth Rate | New followers / Total followers × 100 | 2% / 5% / 10%+ per month |
 
 ## References
 

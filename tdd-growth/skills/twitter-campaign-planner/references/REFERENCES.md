@@ -1,8 +1,18 @@
 # Twitter Campaign Planner References
 
-Last updated: December 2025
+Last updated: January 2026
 
-## Growth Strategy Guides
+## X Algorithm Source Code (Phoenix Architecture)
+
+Official open-source algorithm repository:
+- [X Algorithm Repository (GitHub)](https://github.com/xai-org/x-algorithm) - Phoenix architecture with Grok-based transformer
+- `/tmp/x-algorithm/home-mixer/scorers/author_diversity_scorer.rs` - Author diversity scoring (exponential decay for repeated authors)
+- `/tmp/x-algorithm/home-mixer/scorers/oon_scorer.rs` - Out-of-network scoring and reach factors
+- `/tmp/x-algorithm/home-mixer/scorers/weighted_scorer.rs` - Engagement signal weights
+
+**Key insight from source**: Author Diversity Scorer applies exponential decay to repeated author content, penalizing echo chamber engagement patterns.
+
+## Growth Strategy Guides (2026)
 
 Comprehensive growth strategies for X/Twitter:
 - [How to Grow on Twitter/X: Complete Growth Strategy Guide 2025](https://socialrails.com/blog/how-to-grow-on-twitter-x-complete-guide)
@@ -105,3 +115,29 @@ Realistic growth timelines:
 - Newsletter conversion: Ongoing optimization
 
 Source: Postel analysis of thousands of successful accounts
+
+## 2026 Algorithm Updates
+
+Latest algorithm research and guides:
+- [How The Twitter Algorithm Works: Complete Guide For 2026 | RecurPost](https://recurpost.com/blog/twitter-algorithm/)
+- [Twitter Algorithm Explained: How to Get More Reach in 2026 | Tweet Archivist](https://www.tweetarchivist.com/twitter-algorithm-explained-2025)
+- [Decoding the New X Algorithm to Stay Visible in 2026 | SocialWick](https://www.socialwick.com/decoding-the-new-x-algorithm-to-stay-visible-in-2026)
+- [How Does The X(Twitter) Algorithm Work in 2026 | SocialPilot](https://www.socialpilot.co/blog/twitter-algorithm)
+
+## Shadowban & Visibility Issues
+
+Understanding and recovering from visibility penalties:
+- [Shadowban Test Tool](https://hisubway.online/shadowban/)
+- [Twitter Shadowban Explained: Causes, Detection & Fixes | Pixelscan](https://pixelscan.net/blog/twitter-shadowban-2025-guide/)
+- [Twitter Shadowban Test & Recovery Guide | Tweet Archivist](https://www.tweetarchivist.com/twitter-shadowban-test-guide)
+
+## 2026 Key Data Points
+
+| Metric | Value | Source |
+|--------|-------|--------|
+| Video engagement rate | 0.42% | RecurPost 2026 |
+| Text engagement rate | 0.08% | RecurPost 2026 |
+| Video vs text multiplier | 5x | RecurPost 2026 |
+| Premium in-network boost | 4x | Algorithm source |
+| Premium out-of-network boost | 2x | Algorithm source |
+| External link penalty (non-Premium) | Zero median engagement | March 2026 |
