@@ -1,8 +1,20 @@
 # Tweet Crafter References
 
-Last updated: December 2025
+Last updated: January 2026
 
-## Algorithm & Ranking
+## X Algorithm Source Code (Phoenix Architecture)
+
+Official open-source algorithm repository:
+- [X Algorithm Repository (GitHub)](https://github.com/xai-org/x-algorithm) - Phoenix architecture with Grok-based transformer
+- `/tmp/x-algorithm/README.md` - Architecture overview
+- `/tmp/x-algorithm/phoenix/README.md` - Phoenix ML model documentation
+- `/tmp/x-algorithm/home-mixer/scorers/weighted_scorer.rs` - Score computation and engagement weights
+- `/tmp/x-algorithm/home-mixer/scorers/author_diversity_scorer.rs` - Author diversity scoring
+- `/tmp/x-algorithm/home-mixer/scorers/oon_scorer.rs` - Out-of-network scoring
+
+**Note**: Actual weight values are in the `params` module, excluded from open source release for security reasons.
+
+## Algorithm & Ranking (2026)
 
 Core algorithm explainers:
 - [X (Twitter) Algorithm Explained in 2025: How It Works + 5 Growth Tactics](https://postnext.io/blog/x-twitter-algorithm-explained/)
@@ -79,3 +91,16 @@ Quick reference statistics from research:
 | Long-form impressions | ~10K | Hootsuite experiment |
 | Thread impressions | ~8K | Hootsuite experiment |
 | Best engagement rate (tech content) | 2-6%+ | Industry benchmark |
+| Video engagement rate | 0.42% | RecurPost 2026 |
+| Text engagement rate | 0.08% | RecurPost 2026 |
+| Video vs text multiplier | 5x | RecurPost 2026 |
+| External link penalty (non-Premium) | Zero median engagement | March 2026 |
+
+## 2026 Algorithm Updates
+
+Latest algorithm research and guides:
+- [How The Twitter Algorithm Works: Complete Guide For 2026 | RecurPost](https://recurpost.com/blog/twitter-algorithm/)
+- [Twitter Algorithm Explained: How to Get More Reach in 2026 | Tweet Archivist](https://www.tweetarchivist.com/twitter-algorithm-explained-2025)
+- [How to Grow on Twitter/X: Complete Growth Strategy Guide 2026 | SocialRails](https://socialrails.com/blog/how-to-grow-on-twitter-x-complete-guide)
+- [Decoding the New X Algorithm to Stay Visible in 2026 | SocialWick](https://www.socialwick.com/decoding-the-new-x-algorithm-to-stay-visible-in-2026)
+- [Understanding How the X Algorithm Works in 2026 | SocialBee](https://socialbee.com/blog/twitter-algorithm/)
