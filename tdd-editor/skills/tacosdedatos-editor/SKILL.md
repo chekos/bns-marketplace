@@ -79,10 +79,11 @@ Evaluate against the tacosdedatos voice fingerprint:
 
 Check against engagement mechanics:
 
-**Opening Power**
-- Does the first line create curiosity?
+**Opening Power** (see `references/hook-formulas.md` for patterns)
+- Does the first line use a proven hook formula? (Curiosity, Value-Forward, Story, Data/Surprise, Contrarian, Question)
+- Does the hook create a curiosity gap?
 - Are stakes established within 150 words?
-- Is there a hook that demands continuation?
+- Would this hook work as a tweet or subject line?
 
 **Reader Journey**
 - Is there a transformation story (clear before/after)?
@@ -212,6 +213,7 @@ All reference files are in `references/`:
 - **`editorial-checklist.md`**: Complete checklist for developmental and voice review
 - **`feedback-format.md`**: Templates for structuring editorial feedback
 - **`common-issues.md`**: Detailed patterns of common problems and fixes
+- **`hook-formulas.md`**: Proven hook patterns for evaluating and improving openings
 
 Also reference the writer skill's materials in `../tacosdedatos-writer/references/`:
 - `voice-analysis.md` - Voice rules and when to break them
