@@ -155,11 +155,13 @@ The `tacosdedatos-pipeline` skill is a proof-of-concept for this. Key patterns:
 
 1. [x] Create `content-to-social` skill
 2. [x] Add hook formulas to tdd-editor
-3. [ ] Create `tacosdedatos-pipeline` skill
+3. [x] Create `tacosdedatos-pipeline` skill
 4. [ ] Add shared reference files
 5. [ ] Start plugin validation tests
-6. [ ] Create `trend-monitor` skill
-7. [ ] Document skill interconnection patterns
+6. [x] Create `trend-monitor` skill
+7. [x] Create `content-refresh` skill
+8. [x] Create `article-to-newsletter` skill
+9. [ ] Document skill interconnection patterns
 
 ---
 
