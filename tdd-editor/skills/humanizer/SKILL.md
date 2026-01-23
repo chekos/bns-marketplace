@@ -277,9 +277,9 @@ Avoiding AI patterns is only half the job. Sterile, voiceless writing is just as
 **Problem:** AI chatbots often decorate headings or bullet points with emojis.
 
 **Before:**
-> Launch Phase: The product launches in Q3
-> Key Insight: Users prefer simplicity
-> Next Steps: Schedule follow-up meeting
+> 🚀 **Launch Phase:** The product launches in Q3
+> 💡 **Key Insight:** Users prefer simplicity
+> ✅ **Next Steps:** Schedule follow-up meeting
 
 **After:**
 > The product launches in Q3. User research showed a preference for simplicity. Next step: schedule a follow-up meeting.
@@ -344,13 +344,13 @@ Avoiding AI patterns is only half the job. Sterile, voiceless writing is just as
 
 ### 22. Filler Phrases
 
-**Before -> After:**
-- "In order to achieve this goal" -> "To achieve this"
-- "Due to the fact that it was raining" -> "Because it was raining"
-- "At this point in time" -> "Now"
-- "In the event that you need help" -> "If you need help"
-- "The system has the ability to process" -> "The system can process"
-- "It is important to note that the data shows" -> "The data shows"
+**Before → After:**
+- "In order to achieve this goal" → "To achieve this"
+- "Due to the fact that it was raining" → "Because it was raining"
+- "At this point in time" → "Now"
+- "In the event that you need help" → "If you need help"
+- "The system has the ability to process" → "The system can process"
+- "It is important to note that the data shows" → "The data shows"
 
 ---
 
