@@ -25,7 +25,7 @@
             "name": "tdd-editor",
             "source": "./tdd-editor",
             "description": "Editor-in-Chief for tacosdedatos - content direction, quality assurance, and editorial leadership. Includes 10 skills.",
-            "version": "0.5.2",
+            "version": "0.5.3",
             "author": {
                 "name": "chekos",
                 "url": "https://github.com/chekos"
