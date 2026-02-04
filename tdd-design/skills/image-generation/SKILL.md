@@ -1,264 +1,478 @@
 ---
-name: gemini-imagegen
-description: Low-level Gemini API skill for image generation. Use this skill when you need direct API control, custom resolution/aspect ratios, multi-turn refinement, or non-brand image tasks (logos, stickers, product mockups). For tacosdedatos post banners and brand-consistent illustrations, use tacosdedatos-illustrator instead—it handles creative direction and calls this skill internally.
+name: Image Generator
+description: Generate and edit images using Gemini's Nano Banana Pro model (gemini-3-pro-image-preview). Use this skill when the user asks you to generate images, create visuals, edit photos, create logos, generate product mockups, or perform any image generation/editing task.
+allowed-tools: Read, Write, Bash, WebFetch
 ---
 
-# Gemini Image Generation (Nano Banana Pro)
+# Image Generator
 
-Generate and edit images using Google's Gemini API. The environment variable `GEMINI_API_KEY` must be set.
+This skill generates and edits images using Google's Gemini Nano Banana Pro model (`gemini-3-pro-image-preview`).
 
-## CRITICAL: Output Location
+## IMPORTANT: Setup Required
 
-**Always save images to `/tmp/` with unique filenames.** This is required for Discord delivery.
+Before using this skill, the user must set the `GEMINI_API_KEY` environment variable:
 
-```python
-import uuid
+1. Get a free API key from [Google AI Studio](https://aistudio.google.com/)
+2. Export the key in your shell profile (`~/.zshrc`, `~/.bashrc`, etc.):
+   ```bash
+   export GEMINI_API_KEY="your_api_key_here"
+   ```
+3. Restart your terminal or run `source ~/.zshrc` (or `~/.bashrc`)
 
-# Generate unique filename to avoid collisions
-filename = f"/tmp/{uuid.uuid4()}.jpg"
-image.save(filename)
-print(f"Image saved to: {filename}")
+**The skill will not work without this configuration.**
+
+## Pre-flight Check
+
+Before making any API call, verify the key is set:
+
+```bash
+if [ -z "$GEMINI_API_KEY" ]; then
+  echo "ERROR: GEMINI_API_KEY is not set. Please export it in your shell profile."
+  exit 1
+fi
 ```
 
-**Why `/tmp/`?**
-- Required for the API to detect and serve the image
-- Images saved elsewhere will NOT be delivered to Discord
-- Use UUIDs to prevent filename collisions between users
+If the key is missing, stop and tell the user to set it using the instructions above.
 
-## Default Model
+## Configuration
 
-| Model | Resolution | Best For |
-|-------|------------|----------|
-| `gemini-3-pro-image-preview` | 1K-4K | All image generation (default) |
+**Model**: `gemini-3-pro-image-preview`
 
-**Note:** Always use this Pro model. Only use a different model if explicitly requested.
+**API Key**: Read from the `GEMINI_API_KEY` environment variable
 
-## Quick Reference
+## Iterating on User-Provided Images
 
-### Default Settings
-- **Model:** `gemini-3-pro-image-preview`
-- **Resolution:** 1K (default, options: 1K, 2K, 4K)
-- **Aspect Ratio:** 1:1 (default)
+When the user provides a path to an image they want to edit or iterate on, use this workflow:
 
-### Available Aspect Ratios
-`1:1`, `2:3`, `3:2`, `3:4`, `4:3`, `4:5`, `5:4`, `9:16`, `16:9`, `21:9`
+### Step 1: Read and encode the image to base64
 
-### Available Resolutions
-`1K` (default), `2K`, `4K`
+```bash
+# Get the image path from user
+IMG_PATH="/path/to/user/image.png"
 
-## Core API Pattern
+# Detect mime type
+if [[ "$IMG_PATH" == *.png ]]; then
+    MIME_TYPE="image/png"
+elif [[ "$IMG_PATH" == *.jpg ]] || [[ "$IMG_PATH" == *.jpeg ]]; then
+    MIME_TYPE="image/jpeg"
+elif [[ "$IMG_PATH" == *.webp ]]; then
+    MIME_TYPE="image/webp"
+else
+    MIME_TYPE="image/png"
+fi
+
+# Encode to base64 (works on both macOS and Linux)
+if [[ "$(uname)" == "Darwin" ]]; then
+    IMG_BASE64=$(base64 -i "$IMG_PATH")
+else
+    IMG_BASE64=$(base64 -w0 "$IMG_PATH")
+fi
+```
+
+### Step 2: Send image with edit prompt (File-Based Approach)
+
+**IMPORTANT:** Always use a file-based approach for the request body. Base64-encoded images are too large for command-line arguments and will cause "argument list too long" errors.
+
+```bash
+# User's edit request
+EDIT_PROMPT="Add a santa hat to the person in this image"
+
+# Write request to a JSON file (avoids command line length limits)
+cat > /tmp/gemini_request.json << JSONEOF
+{
+  "contents": [{
+    "parts": [
+      {"text": "$EDIT_PROMPT"},
+      {
+        "inline_data": {
+          "mime_type": "$MIME_TYPE",
+          "data": "$IMG_BASE64"
+        }
+      }
+    ]
+  }],
+  "generationConfig": {
+    "responseModalities": ["TEXT", "IMAGE"]
+  }
+}
+JSONEOF
+
+# Call the API using the file
+curl -s -X POST \
+  "https://generativelanguage.googleapis.com/v1beta/models/gemini-3-pro-image-preview:generateContent" \
+  -H "x-goog-api-key: $GEMINI_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d @/tmp/gemini_request.json > /tmp/gemini_response.json
+```
+
+### Step 3: Extract and save the edited image
+
+```bash
+# Extract image from response and save
+python3 -c "
+import json
+import base64
+
+with open('/tmp/gemini_response.json') as f:
+    data = json.load(f)
+
+for part in data['candidates'][0]['content']['parts']:
+    if 'inlineData' in part:
+        img_data = part['inlineData']['data']
+        mime = part['inlineData']['mimeType']
+        ext = 'png' if 'png' in mime else 'jpg'
+        with open('edited_image.' + ext, 'wb') as out:
+            out.write(base64.b64decode(img_data))
+        print(f'Saved: edited_image.{ext}')
+    elif 'text' in part:
+        print(part['text'])
+"
+```
+
+### Complete Example (File-Based)
+
+For iterating on images, always use file-based requests:
+
+```bash
+# Variables
+IMG_PATH="/path/to/image.png"
+EDIT_PROMPT="Make the background a sunset beach"
+OUTPUT_PATH="edited_output.png"
+# Detect mime type and encode
+MIME_TYPE=$([[ "$IMG_PATH" == *.png ]] && echo "image/png" || echo "image/jpeg")
+IMG_BASE64=$(base64 -i "$IMG_PATH" 2>/dev/null || base64 -w0 "$IMG_PATH")
+
+# Write request to file (required - base64 images are too large for command line)
+cat > /tmp/gemini_request.json << JSONEOF
+{
+  "contents": [{
+    "parts": [
+      {"text": "$EDIT_PROMPT"},
+      {"inline_data": {"mime_type": "$MIME_TYPE", "data": "$IMG_BASE64"}}
+    ]
+  }],
+  "generationConfig": {
+    "responseModalities": ["TEXT", "IMAGE"]
+  }
+}
+JSONEOF
+
+# Call API and extract image
+curl -s -X POST \
+  "https://generativelanguage.googleapis.com/v1beta/models/gemini-3-pro-image-preview:generateContent" \
+  -H "x-goog-api-key: $GEMINI_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d @/tmp/gemini_request.json > /tmp/gemini_response.json
+
+# Save the output image
+python3 -c "
+import json, base64
+with open('/tmp/gemini_response.json') as f:
+    data = json.load(f)
+for part in data.get('candidates', [{}])[0].get('content', {}).get('parts', []):
+    if 'inlineData' in part:
+        with open('$OUTPUT_PATH', 'wb') as f:
+            f.write(base64.b64decode(part['inlineData']['data']))
+        print('Saved: $OUTPUT_PATH')
+"
+```
+
+### Multi-Image Input (Combine/Compose)
+
+To combine elements from multiple images (also uses file-based approach):
+
+```bash
+IMG1_PATH="/path/to/image1.png"
+IMG2_PATH="/path/to/image2.png"
+PROMPT="Put the dress from the first image on the person in the second image"
+IMG1_BASE64=$(base64 -i "$IMG1_PATH" 2>/dev/null || base64 -w0 "$IMG1_PATH")
+IMG2_BASE64=$(base64 -i "$IMG2_PATH" 2>/dev/null || base64 -w0 "$IMG2_PATH")
+
+# Write request to file
+cat > /tmp/gemini_request.json << JSONEOF
+{
+  "contents": [{
+    "parts": [
+      {"text": "$PROMPT"},
+      {"inline_data": {"mime_type": "image/png", "data": "$IMG1_BASE64"}},
+      {"inline_data": {"mime_type": "image/png", "data": "$IMG2_BASE64"}}
+    ]
+  }],
+  "generationConfig": {"responseModalities": ["TEXT", "IMAGE"]}
+}
+JSONEOF
+
+curl -s -X POST \
+  "https://generativelanguage.googleapis.com/v1beta/models/gemini-3-pro-image-preview:generateContent" \
+  -H "x-goog-api-key: $GEMINI_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d @/tmp/gemini_request.json > /tmp/gemini_response.json
+```
+
+## Capabilities
+
+### Text-to-Image Generation
+- Generate high-quality images from text descriptions
+- Support for photorealistic, stylized, and artistic outputs
+- Accurate text rendering in images (logos, infographics, diagrams)
+
+### Image Editing
+- Add or remove elements from images
+- Inpainting with semantic masking (edit specific parts)
+- Style transfer (apply artistic styles to photos)
+- Multi-image composition (combine elements from multiple images)
+
+### Advanced Features
+- **High Resolution**: 1K, 2K, or 4K output
+- **Aspect Ratios**: 1:1, 2:3, 3:2, 3:4, 4:3, 4:5, 5:4, 9:16, 16:9, 21:9
+- **Google Search Grounding**: Generate images based on real-time data
+- **Multi-turn Editing**: Iteratively refine images through conversation
+- **Up to 14 Reference Images**: Combine multiple inputs for complex compositions
+
+## API Usage
+
+### Basic Text-to-Image (Python)
 
 ```python
-import os
 from google import genai
 from google.genai import types
 
-client = genai.Client(api_key=os.environ["GEMINI_API_KEY"])
+client = genai.Client()
 
-# Basic generation (1K, 1:1 - defaults)
 response = client.models.generate_content(
     model="gemini-3-pro-image-preview",
     contents=["Your prompt here"],
     config=types.GenerateContentConfig(
         response_modalities=['TEXT', 'IMAGE'],
-    ),
+        image_config=types.ImageConfig(
+            aspect_ratio="16:9",  # Optional
+            image_size="2K"       # Optional: "1K", "2K", "4K"
+        )
+    )
 )
 
-import uuid
-
 for part in response.parts:
-    if part.text:
+    if part.text is not None:
         print(part.text)
-    elif part.inline_data:
+    elif part.inline_data is not None:
         image = part.as_image()
-        filename = f"/tmp/{uuid.uuid4()}.jpg"
-        image.save(filename)
-        print(f"Image saved to: {filename}")
+        image.save("generated_image.png")
 ```
 
-## Custom Resolution & Aspect Ratio
+### Basic Text-to-Image (JavaScript)
+
+```javascript
+import { GoogleGenAI } from "@google/genai";
+import * as fs from "node:fs";
+
+const ai = new GoogleGenAI({});
+
+const response = await ai.models.generateContent({
+    model: "gemini-3-pro-image-preview",
+    contents: "Your prompt here",
+    config: {
+        responseModalities: ['TEXT', 'IMAGE'],
+        imageConfig: {
+            aspectRatio: "16:9",
+            imageSize: "2K"
+        }
+    }
+});
+
+for (const part of response.candidates[0].content.parts) {
+    if (part.text) {
+        console.log(part.text);
+    } else if (part.inlineData) {
+        const buffer = Buffer.from(part.inlineData.data, "base64");
+        fs.writeFileSync("generated_image.png", buffer);
+    }
+}
+```
+
+### REST API (curl)
+
+```bash
+curl -s -X POST \
+  "https://generativelanguage.googleapis.com/v1beta/models/gemini-3-pro-image-preview:generateContent" \
+  -H "x-goog-api-key: $GEMINI_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "contents": [{
+      "parts": [{"text": "Your prompt here"}]
+    }],
+    "generationConfig": {
+      "responseModalities": ["TEXT", "IMAGE"],
+      "imageConfig": {
+        "aspectRatio": "16:9",
+        "imageSize": "2K"
+      }
+    }
+  }' | jq -r '.candidates[0].content.parts[] | select(.inlineData) | .inlineData.data' | base64 --decode > output.png
+```
+
+### Image Editing (with input image)
 
 ```python
+from google import genai
 from google.genai import types
+from PIL import Image
+
+client = genai.Client()
+
+input_image = Image.open('input.png')
+prompt = "Add a wizard hat to the cat in this image"
 
 response = client.models.generate_content(
     model="gemini-3-pro-image-preview",
-    contents=[prompt],
+    contents=[prompt, input_image],
+    config=types.GenerateContentConfig(
+        response_modalities=['TEXT', 'IMAGE']
+    )
+)
+
+for part in response.parts:
+    if part.inline_data is not None:
+        image = part.as_image()
+        image.save("edited_image.png")
+```
+
+### Multi-Image Composition
+
+```python
+from google import genai
+from google.genai import types
+from PIL import Image
+
+client = genai.Client()
+
+image1 = Image.open('dress.png')
+image2 = Image.open('model.png')
+prompt = "Put the dress from the first image on the model from the second image"
+
+response = client.models.generate_content(
+    model="gemini-3-pro-image-preview",
+    contents=[image1, image2, prompt],
     config=types.GenerateContentConfig(
         response_modalities=['TEXT', 'IMAGE'],
         image_config=types.ImageConfig(
-            aspect_ratio="16:9",  # Wide format
-            image_size="2K"       # Higher resolution
-        ),
+            aspect_ratio="3:4",
+            image_size="2K"
+        )
     )
 )
 ```
 
-### Resolution Examples
+### With Google Search Grounding
 
 ```python
-# 1K (default) - Fast, good for previews
-image_config=types.ImageConfig(image_size="1K")
-
-# 2K - Balanced quality/speed
-image_config=types.ImageConfig(image_size="2K")
-
-# 4K - Maximum quality, slower
-image_config=types.ImageConfig(image_size="4K")
-```
-
-### Aspect Ratio Examples
-
-```python
-# Square (default)
-image_config=types.ImageConfig(aspect_ratio="1:1")
-
-# Landscape wide
-image_config=types.ImageConfig(aspect_ratio="16:9")
-
-# Ultra-wide panoramic
-image_config=types.ImageConfig(aspect_ratio="21:9")
-
-# Portrait
-image_config=types.ImageConfig(aspect_ratio="9:16")
-
-# Photo standard
-image_config=types.ImageConfig(aspect_ratio="4:3")
-```
-
-## Editing Images
-
-Pass existing images with text prompts:
-
-```python
-from PIL import Image
-
-img = Image.open("input.png")
-response = client.models.generate_content(
-    model="gemini-3-pro-image-preview",
-    contents=["Add a sunset to this scene", img],
-    config=types.GenerateContentConfig(
-        response_modalities=['TEXT', 'IMAGE'],
-    ),
-)
-```
-
-## Multi-Turn Refinement
-
-Use chat for iterative editing:
-
-```python
+from google import genai
 from google.genai import types
 
-chat = client.chats.create(
-    model="gemini-3-pro-image-preview",
-    config=types.GenerateContentConfig(response_modalities=['TEXT', 'IMAGE'])
-)
+client = genai.Client()
 
-response = chat.send_message("Create a logo for 'Acme Corp'")
-# Save first image...
-
-response = chat.send_message("Make the text bolder and add a blue gradient")
-# Save refined image...
-```
-
-## Prompting Best Practices
-
-### Photorealistic Scenes
-Include camera details: lens type, lighting, angle, mood.
-> "A photorealistic close-up portrait, 85mm lens, soft golden hour light, shallow depth of field"
-
-### Stylized Art
-Specify style explicitly:
-> "A kawaii-style sticker of a happy red panda, bold outlines, cel-shading, white background"
-
-### Text in Images
-Be explicit about font style and placement:
-> "Create a logo with text 'Daily Grind' in clean sans-serif, black and white, coffee bean motif"
-
-### Product Mockups
-Describe lighting setup and surface:
-> "Studio-lit product photo on polished concrete, three-point softbox setup, 45-degree angle"
-
-## Advanced Features
-
-### Google Search Grounding
-Generate images based on real-time data:
-
-```python
 response = client.models.generate_content(
     model="gemini-3-pro-image-preview",
-    contents=["Visualize today's weather in Tokyo as an infographic"],
+    contents="Visualize the current weather forecast for San Francisco",
     config=types.GenerateContentConfig(
         response_modalities=['TEXT', 'IMAGE'],
+        image_config=types.ImageConfig(aspect_ratio="16:9"),
         tools=[{"google_search": {}}]
     )
 )
 ```
 
-### Multiple Reference Images (Up to 14)
-Combine elements from multiple sources:
+## Prompting Best Practices
 
-```python
-response = client.models.generate_content(
-    model="gemini-3-pro-image-preview",
-    contents=[
-        "Create a group photo of these people in an office",
-        Image.open("person1.png"),
-        Image.open("person2.png"),
-        Image.open("person3.png"),
-    ],
-    config=types.GenerateContentConfig(
-        response_modalities=['TEXT', 'IMAGE'],
-    ),
-)
+### 1. Be Descriptive, Not Keyword-Based
+Instead of: `cat, wizard hat, cute`
+Write: `A fluffy orange cat wearing a small knitted wizard hat, sitting on a wooden floor with soft natural lighting from a window`
+
+### 2. Specify Style and Mood
+- Photography terms: "shot with 85mm lens", "soft bokeh background", "golden hour lighting"
+- Artistic styles: "in the style of Van Gogh", "minimalist illustration", "photorealistic"
+- Mood: "warm and cozy atmosphere", "dramatic noir lighting"
+
+### 3. For Text in Images
+Be explicit about:
+- The exact text to render
+- Font style (descriptively): "clean, bold, sans-serif font"
+- Placement and size
+
+### 4. For Editing
+- Describe what to change and what to preserve
+- Use "keep everything else unchanged"
+- Reference specific elements clearly
+
+### 5. For Product/Commercial Images
+Mention:
+- Lighting setup: "three-point softbox lighting"
+- Background: "clean white studio background"
+- Camera angle: "slightly elevated 45-degree shot"
+
+## Resolution and Aspect Ratio Reference
+
+| Aspect Ratio | 1K Resolution | 2K Resolution | 4K Resolution |
+|--------------|---------------|---------------|---------------|
+| 1:1          | 1024x1024     | 2048x2048     | 4096x4096     |
+| 16:9         | 1376x768      | 2752x1536     | 5504x3072     |
+| 9:16         | 768x1376      | 1536x2752     | 3072x5504     |
+| 3:2          | 1264x848      | 2528x1696     | 5056x3392     |
+| 2:3          | 848x1264      | 1696x2528     | 3392x5056     |
+
+## Common Use Cases
+
+### Logo Creation
+```
+Create a modern, minimalist logo for a coffee shop called 'The Daily Grind'.
+The text should be in a clean, bold, sans-serif font.
+Black and white color scheme. Put the logo in a circle.
 ```
 
-## Important: File Format & Media Type
-
-**CRITICAL:** The Gemini API returns images in JPEG format by default. When saving, always use `.jpg` extension to avoid media type mismatches.
-
-```python
-import uuid
-
-# CORRECT - Use /tmp/ with .jpg extension
-filename = f"/tmp/{uuid.uuid4()}.jpg"
-image.save(filename)
-print(f"Image saved to: {filename}")
-
-# WRONG - Will NOT be delivered to Discord
-image.save("output.jpg")  # Not in /tmp/!
-image.save("/app/image.jpg")  # Wrong directory!
+### Product Photography
+```
+A high-resolution, studio-lit product photograph of a minimalist ceramic
+coffee mug in matte black on a polished concrete surface. Three-point
+softbox lighting with soft, diffused highlights. Slightly elevated
+45-degree camera angle. Sharp focus on steam rising from the coffee.
 ```
 
-### Converting to PNG (if needed)
-
-If you specifically need PNG format:
-
-```python
-from PIL import Image
-
-# Generate with Gemini
-for part in response.parts:
-    if part.inline_data:
-        img = part.as_image()
-        # Convert to PNG by saving with explicit format
-        img.save("output.png", format="PNG")
+### Style Transfer
+```
+Transform this photograph of a city street at night into Vincent van Gogh's
+'Starry Night' style. Preserve the composition but render with swirling,
+impasto brushstrokes and deep blues with bright yellows.
 ```
 
-### Verifying Image Format
+### Infographic
+```
+Create a vibrant infographic explaining photosynthesis as a recipe.
+Show "ingredients" (sunlight, water, CO2) and "finished dish" (sugar/energy).
+Style like a colorful kids' cookbook, suitable for 4th graders.
+```
 
-Check actual format vs extension with the `file` command:
+## Error Handling
 
+Common issues:
+- **No image returned**: Check that `response_modalities` includes `'IMAGE'`
+- **Safety filters**: Some prompts may be blocked; try rephrasing
+- **Rate limits**: Implement exponential backoff for retries
+- **Large images**: For 4K, ensure sufficient timeout settings
+
+## Dependencies
+
+To use the Python SDK:
 ```bash
-file image.png
-# If output shows "JPEG image data" - rename to .jpg!
+pip install google-genai pillow
 ```
 
-## Notes
+For JavaScript:
+```bash
+npm install @google/genai
+```
 
-- All generated images include SynthID watermarks
-- Gemini returns **JPEG format by default** - always use `.jpg` extension
-- Image-only mode (`responseModalities: ["IMAGE"]`) won't work with Google Search grounding
-- For editing, describe changes conversationally—the model understands semantic masking
-- Default to 1K resolution for speed; use 2K/4K when quality is critical
+## Important Notes
+
+- All generated images include a SynthID watermark
+- The model uses a "thinking" process for complex prompts
+- For best text rendering, generate text first, then request image with that text
+- Images are not stored by the API - save outputs locally
