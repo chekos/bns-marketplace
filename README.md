@@ -4,7 +4,7 @@ The brasas & nube marketplace for Claude Code plugins. Three focused plugins:
 
 | Plugin | What it is |
 |--------|------------|
-| **bns-dev** | Opinionated GitHub development workflows (create-issue, solve-issue, review-pr, resolve-pr-comments), plus `gemini-imagegen` — low-level Gemini (Nano Banana) image generation. |
+| **bns-dev** | Opinionated GitHub development workflows (create-issue, solve-issue, review-pr, resolve-pr-comments), plus the **`image-generator`** skill — Gemini (Nano Banana Pro) image generation. |
 | **writing** | General-purpose, publication-agnostic writing & editing skills: `fact-checker`, `humanizer`, `essay-pattern-language`, `content-refresh`, `tunelito` (human-in-the-loop review). |
 
 > Narrowed from seven plugins to three on 2026-06-08 — see [ARCHIVE.md](ARCHIVE.md) for what was removed and how to recover it. The private editorial workshop (`developmental-editor`, `hip-hop-ear`, `exit-ramp-audit`, `idea-to-draft`, `voice-codification`) lives in the separate **writing-skills** repo.

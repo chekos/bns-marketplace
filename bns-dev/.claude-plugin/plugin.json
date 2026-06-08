@@ -1,6 +1,6 @@
 {
     "name": "bns-dev",
-    "description": "An opinionated plugin for development tasks as done in brasas&nube. Also includes gemini-imagegen — low-level Gemini (Nano Banana) image generation with direct API control.",
+    "description": "An opinionated plugin for development tasks as done in brasas&nube. Also includes the image-generator skill — Gemini (Nano Banana Pro) image generation.",
     "version": "0.1.1",
     "author": {
         "name": "chekos"
