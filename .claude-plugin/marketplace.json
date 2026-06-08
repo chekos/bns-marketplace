@@ -22,26 +22,26 @@
             ]
         },
         {
-            "name": "tdd-editor",
-            "source": "./tdd-editor",
-            "description": "Editor-in-Chief for tacosdedatos - content direction, quality assurance, and editorial leadership. Includes 10 skills.",
-            "version": "0.5.4",
+            "name": "writing",
+            "source": "./writing",
+            "description": "General-purpose, publication-agnostic writing & editing skills: fact-checker, humanizer, essay-pattern-language, content-refresh, and tunelito (human-in-the-loop review).",
+            "version": "0.1.0",
             "author": {
                 "name": "chekos",
                 "url": "https://github.com/chekos"
             },
             "homepage": "https://github.com/chekos/bns-marketplace",
             "tags": [
-                "editorial",
-                "content",
-                "writing"
+                "writing",
+                "editing",
+                "editorial"
             ]
         },
         {
-            "name": "tdd-design",
-            "source": "./tdd-design",
-            "description": "Chief of Design for tacosdedatos - visual identity, AI image generation, and brand consistency. Includes 5 skills.",
-            "version": "0.3.1",
+            "name": "design",
+            "source": "./design",
+            "description": "Image generation skills. gemini-imagegen: low-level Gemini (Nano Banana) image generation with direct API control.",
+            "version": "0.1.0",
             "author": {
                 "name": "chekos",
                 "url": "https://github.com/chekos"
@@ -49,73 +49,7 @@
             "homepage": "https://github.com/chekos/bns-marketplace",
             "tags": [
                 "design",
-                "visual",
-                "branding"
-            ]
-        },
-        {
-            "name": "tdd-tech",
-            "source": "./tdd-tech",
-            "description": "CTO for tacosdedatos - technical quality, code review, tutorials, and developer experience. Includes 5 skills.",
-            "version": "0.3.1",
-            "author": {
-                "name": "chekos",
-                "url": "https://github.com/chekos"
-            },
-            "homepage": "https://github.com/chekos/bns-marketplace",
-            "tags": [
-                "technical",
-                "code-review",
-                "tutorials"
-            ]
-        },
-        {
-            "name": "tdd-growth",
-            "source": "./tdd-growth",
-            "description": "CGO for tacosdedatos - SEO, social media, newsletter growth, and analytics. Includes 19 skills.",
-            "version": "0.3.1",
-            "author": {
-                "name": "chekos",
-                "url": "https://github.com/chekos"
-            },
-            "homepage": "https://github.com/chekos/bns-marketplace",
-            "tags": [
-                "growth",
-                "seo",
-                "social-media",
-                "analytics"
-            ]
-        },
-        {
-            "name": "tdd-revenue",
-            "source": "./tdd-revenue",
-            "description": "CRO for tacosdedatos - revenue strategy, sponsorships, products, and monetization. Includes 4 skills.",
-            "version": "0.3.1",
-            "author": {
-                "name": "chekos",
-                "url": "https://github.com/chekos"
-            },
-            "homepage": "https://github.com/chekos/bns-marketplace",
-            "tags": [
-                "revenue",
-                "sponsorships",
-                "monetization"
-            ]
-        },
-        {
-            "name": "tdd-community",
-            "source": "./tdd-community",
-            "description": "Community Director for tacosdedatos - member experience, events, and community health. Includes 4 skills.",
-            "version": "0.3.1",
-            "author": {
-                "name": "chekos",
-                "url": "https://github.com/chekos"
-            },
-            "homepage": "https://github.com/chekos/bns-marketplace",
-            "tags": [
-                "community",
-                "events",
-                "moderation"
+                "image-generation"
             ]
         }
     ]
