@@ -1,8 +1,0 @@
-{
-  "name": "design",
-  "description": "Image generation skills. gemini-imagegen: low-level Gemini (Nano Banana) image generation with direct API control — custom resolution/aspect ratios, multi-turn refinement, logos, stickers, product mockups.",
-  "author": {
-    "name": "chekos",
-    "url": "https://github.com/chekos"
-  }
-}

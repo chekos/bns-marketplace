@@ -9,7 +9,7 @@
         {
             "name": "bns-dev",
             "source": "./bns-dev",
-            "description": "An opinionated plugin for development tasks as done in brasas&nube.",
+            "description": "An opinionated plugin for development tasks as done in brasas&nube. Also includes gemini-imagegen (low-level Gemini image generation).",
             "version": "0.1.1",
             "author": {
                 "name": "chekos",
@@ -35,21 +35,6 @@
                 "writing",
                 "editing",
                 "editorial"
-            ]
-        },
-        {
-            "name": "design",
-            "source": "./design",
-            "description": "Image generation skills. gemini-imagegen: low-level Gemini (Nano Banana) image generation with direct API control.",
-            "version": "0.1.0",
-            "author": {
-                "name": "chekos",
-                "url": "https://github.com/chekos"
-            },
-            "homepage": "https://github.com/chekos/bns-marketplace",
-            "tags": [
-                "design",
-                "image-generation"
             ]
         }
     ]

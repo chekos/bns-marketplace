@@ -4,9 +4,8 @@ The brasas & nube marketplace for Claude Code plugins. Three focused plugins:
 
 | Plugin | What it is |
 |--------|------------|
-| **bns-dev** | Opinionated GitHub development workflows (create-issue, solve-issue, review-pr, resolve-pr-comments). |
+| **bns-dev** | Opinionated GitHub development workflows (create-issue, solve-issue, review-pr, resolve-pr-comments), plus `gemini-imagegen` — low-level Gemini (Nano Banana) image generation. |
 | **writing** | General-purpose, publication-agnostic writing & editing skills: `fact-checker`, `humanizer`, `essay-pattern-language`, `content-refresh`, `tunelito` (human-in-the-loop review). |
-| **design** | `gemini-imagegen` — low-level Gemini (Nano Banana) image generation with direct API control. |
 
 > Narrowed from seven plugins to three on 2026-06-08 — see [ARCHIVE.md](ARCHIVE.md) for what was removed and how to recover it. The private editorial workshop (`developmental-editor`, `hip-hop-ear`, `exit-ramp-audit`, `idea-to-draft`, `voice-codification`) lives in the separate **writing-skills** repo.
 
@@ -16,9 +15,8 @@ Add the marketplace, then install whichever plugins you want:
 
 ```bash
 /plugin marketplace add https://github.com/chekos/bns-marketplace
-/plugin install bns-dev      # dev workflows
+/plugin install bns-dev      # dev workflows + image generation
 /plugin install writing      # writing & editing
-/plugin install design       # image generation
 ```
 
 ### One-Command Installation
