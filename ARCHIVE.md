@@ -1,8 +1,9 @@
 # Archive — 2026-06-08 curation
 
 This marketplace was deliberately narrowed on 2026-06-08 from seven "department"
-plugins (49 skills) down to two: **bns-dev** (dev workflows + the `image-generator`
-skill) and **writing**.
+plugins (49 skills) down to two: **bns-dev** (now the `image-generator` skill — its
+GitHub workflow commands were retired 2026-06-08, superseded by compound-engineering)
+and **writing**.
 
 Everything removed below is preserved in git history. To recover any of it:
 

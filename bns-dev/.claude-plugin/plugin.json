@@ -1,6 +1,6 @@
 {
     "name": "bns-dev",
-    "description": "An opinionated plugin for development tasks as done in brasas&nube. Also includes the image-generator skill — Gemini (Nano Banana Pro) image generation.",
+    "description": "The brasas & nube development plugin. Currently ships the image-generator skill (Gemini Nano Banana Pro image generation). Its GitHub workflow commands were retired in favor of compound-engineering; home for dev tooling as it emerges.",
     "version": "0.1.1",
     "author": {
         "name": "chekos"
