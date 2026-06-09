@@ -1,6 +1,7 @@
 {
   "name": "writing",
   "description": "General-purpose, publication-agnostic writing & editing skills. fact-checker (verdicts per claim), humanizer (scrub AI-writing patterns, from Wikipedia's Signs of AI writing), essay-pattern-language (27-pattern evaluation, after Michael Dean / Christopher Alexander), content-refresh (parked), and tunelito (human-in-the-loop review surface).",
+  "version": "0.1.1",
   "author": {
     "name": "chekos",
     "url": "https://github.com/chekos"
