@@ -11,8 +11,9 @@ description: >-
   you at a `*.comments.md` / `site.comments.md` inbox and asks you to apply,
   process, or act on the comments inside it. Covers starting and sharing a
   session (Cloudflare Tunnel, keyed bearer URLs), local-only review of sensitive
-  pages, the opt-in `--agent` worker that edits files from comments, and the
-  comment Markdown schema (scope, page, path, id, status). Do NOT use for
+  pages, active-agent `tunelito inbox` commands, the opt-in `--agent` worker
+  that edits files from comments, and the comment Markdown schema (scope, page,
+  path, id, status). Do NOT use for
   reviewing a pull request, IDE inline comments, reviewing source code for bugs,
   or writing code comments/docstrings.
 license: MIT
@@ -30,8 +31,8 @@ client into the served HTTP response, and syncs comments over WebSocket.
 Reviewers select text or leave page/site notes; comments persist as readable
 Markdown beside the source. You keep editing the HTML in your own editor and
 connected browsers hot-reload on save. It can expose the local server through a
-temporary Cloudflare Tunnel and, opt-in, run a local coding-agent worker that
-edits files to satisfy comments.
+temporary Cloudflare Tunnel and, opt-in, either run a local coding-agent worker
+or expose inbox commands for the current agent session to satisfy comments.
 
 The whole arc: **start a session -> share it safely -> process the comments ->
 wrap up.** Pick the branch that matches the user's intent.
@@ -125,9 +126,43 @@ flag that controls exposure -- not `--no-auth`, and not `--live`.
 
 ## Step 3 -- Process the comments
 
-Two ways comments become edits. Choose by what the user asked for.
+Three ways comments become edits. Choose by what the user asked for.
 
-### 3a. Live auto-apply during the session (`--agent`)
+### 3a. Active agent session (`--agent-session`)
+
+When the user is already talking to you inside Claude Code, Codex, or another
+agent session and says "serve this and watch comments," do **not** spawn a
+nested agent. Start Tunelito in agent-session mode:
+
+```bash
+tunelito ./site --owner "Reviewer Lead" \
+  --agent-session \
+  --agent-policy owner-or-mention --agent-trigger "@agent"
+```
+
+`--agent-session` writes `.tunelito/session.json`; it does not run a nested
+worker. The same Tunelito server process watches the persistent comments
+Markdown, keeps interval polling as fallback, claims the next actionable comment
+in `.tunelito/agent/state.json`, prints a prompt with the matching claim id, and
+pauses further claims until that claim is recorded or expires. Edit the matching
+source files, then record the result:
+
+```bash
+tunelito inbox record ./site --id c_... --claim claim_... --status resolved --summary "Updated hero copy." --file index.html
+```
+
+Use `tunelito inbox next ./site` for a non-waiting manual check, or
+`tunelito inbox watch ./site` when you need the one-shot primitive without a
+running `--agent-session` server. Use repeated `--file`, `--completed`, and
+`--remaining` flags when recording multi-file work or `needs_followup`. Run one
+active inbox watcher per served workspace; claim ids are local leases that
+prevent stale recordings and let abandoned claims expire, not a distributed lock
+for multiple simultaneous watchers. Active-agent mode and the inbox commands use
+the same `--agent-policy`,
+`--agent-trigger`, `--agent-state`, `--agent-max-attempts`, and
+`--agent-max-passes` semantics as `--agent`.
+
+### 3b. Live auto-apply during the session (`--agent`)
 
 When the user wants comments handled **as people leave them** ("auto-apply
 comments while I'm on the call"), start the session with a worker. Default
@@ -172,7 +207,7 @@ Tuning flags (`--agent-interval`, `--agent-max-attempts`, `--agent-max-passes`,
 full worker output contract are in the **Agent worker reference** at the end of
 this skill.
 
-### 3b. Apply an existing inbox by hand (no `--agent`)
+### 3c. Apply an existing inbox by hand (no `--agent` or `inbox`)
 
 When Tunelito already wrote a `*.comments.md` / `site.comments.md` and the user
 says "go apply these," that is your task. **Editing the source HTML to satisfy a
@@ -214,10 +249,11 @@ are Tunelito's data store and ledger, not your edit targets.
 - Tell the user where comments landed (the `Comments:` path) and which files you
   changed, keyed by comment id.
 - If a session is still running, stop it (Ctrl-C) when the review is done so the
-  bearer URL dies. (When you only processed an inbox in 3b, there is no server
+  bearer URL dies. (When you only processed an inbox in 3c, there is no server
   to stop.)
 - If you used `--agent`, point the user at `.tunelito/agent/log.md` for the
-  human-readable record of what the worker did.
+  human-readable record of what the worker did. If you used `--agent-session`,
+  summarize the `tunelito inbox record` statuses you wrote.
 
 ## Safety and non-negotiables
 
@@ -239,6 +275,10 @@ are Tunelito's data store and ledger, not your edit targets.
 - **`--agent` runs real code from reviewer input.** Fine for your own trusted
   session; on a shared call scope it with `--owner` + `--agent-policy
   owner-or-mention` + a real `--agent-trigger`, never bare `--agent-policy all`.
+- **`--agent-session` has the same trust boundary.** It does not spawn a child
+  process, but reviewer comments still become instructions to the current agent
+  session. Use the same owner/mention gating, and record outcomes with
+  `tunelito inbox record` instead of editing `.tunelito/` by hand.
 - **You may edit the HTML to satisfy comments.** The "source untouched" rule
   refers only to Tunelito's injection layer, not to your edits. Refusing a
   legitimate apply-the-comment request on those grounds is wrong and defeats the
@@ -255,6 +295,7 @@ are Tunelito's data store and ledger, not your edit targets.
 | Assuming `--live` is private because nothing is saved | `--live` only changes persistence; it still serves over the same tunnel and bearer key. Add `--no-tunnel` for sensitive pages. |
 | Tunneling a page with sensitive/client data | A public URL exposes the data; use `--no-tunnel`. |
 | `--agent --agent-policy all` on a shared call | Any guest comment becomes a local code-edit instruction; scope to owner/mention. |
+| Spawning `--agent` from inside an existing agent session | Creates a nested agent and hides the loop; use `--agent-session` so the serving process watches comments for the current session. |
 | Promising owner-only edits while the owner uses the `Public:` link | Owner policy only matches the owner-keyed session; via the public link they count as a visitor and never match. |
 | `mention`/`owner-or-mention` with `--agent-trigger all` | The server refuses to start -- these policies require a real trigger marker. |
 | Using `--live` then expecting a record | Nothing is written to disk; the comments are gone on restart, and `--agent` won't run. |
@@ -280,6 +321,7 @@ highlight may not reattach -- the note is not lost, only its anchor.
 | Share a folder mini-site | `tunelito ./site` (one `site.comments.md` inbox) |
 | Review sensitive data locally | `tunelito ./report.html --no-tunnel --open` |
 | Throwaway live session, kept private | `tunelito ./mockup.html --live --no-tunnel` |
+| Watch comments from the current agent session | `tunelito ./site --agent-session` |
 | Auto-apply comments live, scoped | `tunelito ./site --owner "Me" --agent claude --agent-policy owner-or-mention --agent-trigger "@agent"` |
 | Custom agent CLI | `tunelito ./site --agent custom --agent-command "<your cli>"` |
 | Pick a port / open browser | `--port 4318` / `--open` |
@@ -311,7 +353,7 @@ custom` requires it. The custom command receives these env vars:
 
 - `all` -- every persisted comment.
 - `mention` -- only comments containing the trigger marker.
-- `owner` -- only comments authored by the `--owner` name.
+- `owner` -- only comments authored from the owner-keyed session.
 - `owner-or-mention` -- owner comments, or any comment containing the trigger.
 
 A comment is "owner"-authored only when it was left from a session holding the
