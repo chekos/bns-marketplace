@@ -1,0 +1,41 @@
+{
+  "skill_name": "repo-modernization-auditor",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "I have not worked on this repo in about a year. It was vibe coded at first and there are probably stale docs, broken tests, and old agent instructions. Before editing anything, look around, run the obvious baseline checks, and tell me what this repo is today, what looks risky, and what first cleanup slice you recommend.",
+      "expected_output": "A read-only repo orientation with health baseline, stale-context risks, and a proposed first cleanup slice. The response should avoid making edits and should distinguish docs from current implementation truth.",
+      "files": [],
+      "expectations": [
+        "Inspects repository structure, docs, git status, package scripts, and verification commands before recommending changes.",
+        "Runs or proposes repo-native baseline checks and reports pass/fail results separately from recommendations.",
+        "Identifies stale docs, old agent instructions, generated artifacts, or completed todos as possible cleanup targets.",
+        "Stops before editing because the prompt explicitly asks for a report first."
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "This old SaaS repo has a giant docs folder, a bunch of completed TODO markdown files, and two different agent instruction files. Clean it up for future agents. It is okay to delete obsolete stuff because git history is the archive, but keep real decisions and deployment gotchas.",
+      "expected_output": "A cautious cleanup workflow that first classifies docs and agent instructions as current, stale, or aspirational, then proposes or implements a focused deletion/consolidation slice while preserving ADRs and operational knowledge.",
+      "files": [],
+      "expectations": [
+        "Treats git history as the archive while still preserving current ADRs and operational footguns.",
+        "Classifies stale context before deleting instead of deleting by filename alone.",
+        "Consolidates or updates agent guidance into a concise current source of truth.",
+        "Runs relevant checks after cleanup or states exactly why checks were not run."
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "Please bring this older Next.js app up to current best practices. Audit security, dependencies, tests, build, docs, and over-engineering. Do not trust the README blindly. Make a plan and then start with the safest high-value fixes.",
+      "expected_output": "A modernization audit and implementation plan that verifies current framework guidance, checks security and quality gates, prioritizes issues by risk, and begins with a reviewable first slice if enough evidence exists.",
+      "files": [],
+      "expectations": [
+        "Uses current official framework or library documentation when evaluating best practices that may have changed.",
+        "Audits security-sensitive areas including auth, authorization, secrets, API routes, file upload, rate limiting, and error leakage.",
+        "Separates broken gates from stale tests or tooling drift.",
+        "Avoids broad style rewrites and starts with a small high-value implementation slice."
+      ]
+    }
+  ]
+}
