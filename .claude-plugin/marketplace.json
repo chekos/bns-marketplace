@@ -25,7 +25,7 @@
             "name": "writing",
             "source": "./writing",
             "description": "General-purpose, publication-agnostic writing & editing skills: fact-checker, humanizer, essay-pattern-language, content-refresh, and tunelito (human-in-the-loop review).",
-            "version": "0.1.3",
+            "version": "0.1.4",
             "author": {
                 "name": "chekos",
                 "url": "https://github.com/chekos"

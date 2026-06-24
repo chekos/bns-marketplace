@@ -92,8 +92,9 @@ Defaults that matter: binds `127.0.0.1`, picks the first free port from `4317`,
 writes `<page-or-folder>.comments.md` beside the source. Useful tweaks (all
 optional): `--port <n>` if 4317 is taken, `--host <host>` to change the bind,
 `--out <path>` to redirect the inbox, `--open` to launch the Local URL,
-`--owner <name>` to label yourself in the viewer and tag your comments with
-`author role: owner`.
+`--owner <name>` to seed the direct local owner's display name. Comments made
+through the loopback `Local:` URL are tagged with `author role: owner`; comments
+made through the `Public:` tunnel URL are visitors.
 
 ## Step 2 -- Share it safely
 
@@ -105,9 +106,10 @@ unreachable for a remote person). Then tell them the one thing that matters:
 > sets a short-lived HTTP-only cookie. Treat the link like a password: share it
 > only in a trusted channel and stop the session when the review is done.
 
-`--owner` adds a separate owner key to the `Local:` URL and labels that person.
-It is a session **label**, not stronger auth; do not present it as a permission
-boundary.
+Owner status is assigned by the server from how the browser reached Tunelito:
+the direct loopback `Local:` URL is owner, while public tunnel or forwarded
+URLs are visitors. `--owner` only seeds the editable owner display name; do not
+present it as account authentication.
 
 **Never pass `--no-auth` while a tunnel is active.** `--no-auth` and the tunnel
 are **independent** -- `--no-auth` only removes the key gate; it does NOT turn
@@ -223,11 +225,10 @@ notes, or notes containing the trigger) is the safe default for a shared call. T
 silently fall through.
 
 Watch the owner-gating trap: a person counts as the **owner** for policy only
-when their session carries the owner key, i.e. they opened the `Owner:`/`Local:`
-URL. If the user reviews via the **`Public:`** link they are seen as a visitor,
-so `owner` and `owner-or-mention` will silently never match their comments
-unless another owner-keyed session approves the comment. When you set up
-"only I can trigger edits," either have the user open the owner-keyed Local URL,
+from the direct loopback `Local:` URL. If the user reviews via the **`Public:`**
+link they are seen as a visitor, so `owner` and `owner-or-mention` will silently
+never match their comments unless the direct local owner approves the comment.
+When you set up "only I can trigger edits," either have the user open the Local URL,
 or rely on the `--agent-trigger` marker for them.
 
 The worker logs decisions to `.tunelito/agent/state.json` (ledger) and
@@ -330,7 +331,7 @@ are Tunelito's data store and ledger, not your edit targets.
 | Tunneling a page with sensitive/client data | A public URL exposes the data; use `--no-tunnel`. |
 | `--agent --agent-policy all` on a shared call | Any guest comment becomes a local code-edit instruction; scope to owner/mention. |
 | Spawning `--agent` from inside an existing agent session | Creates a nested agent and hides the loop; use `--agent-session` so the serving process watches comments for the current session. |
-| Promising owner-only edits while the owner uses the `Public:` link | Owner policy only matches the owner-keyed session; via the public link they count as a visitor and never match. |
+| Promising owner-only edits while the owner uses the `Public:` link | Owner policy only matches the direct loopback `Local:` session; via the public link they count as a visitor and never match. |
 | `mention`/`owner-or-mention` with `--agent-trigger all` | The server refuses to start -- these policies require a real trigger marker. |
 | Using `--live` then expecting a record | Nothing is written to disk; the comments are gone on restart, and `--agent` won't run. |
 | Editing `*.comments.md` or `.tunelito/` directly | Corrupts the inbox/ledger Tunelito round-trips; let the tool own them. |
@@ -387,16 +388,16 @@ custom` requires it. The custom command receives these env vars:
 
 - `all` -- every persisted comment.
 - `mention` -- only comments containing the trigger marker.
-- `owner` -- only comments authored from the owner-keyed session or visitor
+- `owner` -- only comments authored from the direct local owner session or visitor
   comments explicitly approved by the owner.
 - `owner-or-mention` -- owner-authored comments, owner-approved visitor
   comments, or any comment containing the trigger.
 
-A comment is "owner"-authored only when it was left from a session holding the
-owner key (the `Owner:`/`Local:` URL). If the owner reviews via the `Public:`
-link they count as a visitor, so `owner` and `owner-or-mention` will not match
-their notes unless another owner-keyed session approves the comment. Rely on
-the trigger marker for them, or have them open the owner-keyed Local URL.
+A comment is "owner"-authored only when it was left from the direct loopback
+`Local:` URL. If the owner reviews via the `Public:` link they count as a
+visitor, so `owner` and `owner-or-mention` will not match their notes unless the
+direct local owner approves the comment. Rely on the trigger marker for them, or
+have them open the Local URL.
 
 `--agent-trigger <txt>` is the marker for the mention policies (default `all`).
 The `mention` and `owner-or-mention` policies **require** a non-`all` trigger
