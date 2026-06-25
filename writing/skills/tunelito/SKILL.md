@@ -30,9 +30,10 @@ Tunelito serves a local HTML file or folder, injects a same-origin annotation
 client into the served HTTP response, and syncs comments over WebSocket.
 Reviewers select text or leave page/site notes; comments persist as readable
 Markdown beside the source. You keep editing the HTML in your own editor and
-connected browsers hot-reload on save. It can expose the local server through a
-temporary Cloudflare Tunnel and, opt-in, either run a local coding-agent worker
-or expose inbox commands for the current agent session to satisfy comments.
+connected browsers hot-reload on save, deferring reload while a comment composer
+is open so draft text is not lost. It can expose the local server through a
+temporary Cloudflare Tunnel and, opt-in, either run a local coding-agent worker or
+expose inbox commands for the current agent session to satisfy comments.
 
 The whole arc: **start a session -> share it safely -> process the comments ->
 wrap up.** Pick the branch that matches the user's intent.
@@ -87,6 +88,10 @@ Public:   https://<random>.trycloudflare.com/?tunelito_key=...   # share THIS
 `Public:` is the only shareable URL. `Live:` (printed with `--live`) is a
 **transport status line** ("WebRTC peer-to-peer when available; WebSocket relay
 fallback enabled"), not a URL -- never hand it to a reviewer.
+
+The printed review URL and `tunelito_key` stay valid for the lifetime of that
+server process. If the reviewer closes a tab, reopen the same URL instead of
+restarting Tunelito and minting a new key.
 
 Defaults that matter: binds `127.0.0.1`, picks the first free port from `4317`,
 writes `<page-or-folder>.comments.md` beside the source. Useful tweaks (all
@@ -161,19 +166,38 @@ tunelito inbox record ./site --id c_... --claim claim_... --status resolved --su
 ```
 
 Use `tunelito inbox status ./site` to inspect the same work tracker in the
-terminal. It prints pending and claimed comment work as unchecked tasks, and
-completed work as checked, crossed-out tasks.
+terminal. It prints pending and claimed comment work as unchecked tasks, includes
+the active claim id for claimed work, and prints completed work as checked,
+crossed-out tasks.
 
-Use `tunelito inbox next ./site` for a non-waiting manual check, or
-`tunelito inbox watch ./site` when you need the one-shot primitive without a
-running `--agent-session` server. Use repeated `--file`, `--completed`, and
-`--remaining` flags when recording multi-file work or `needs_followup`. Run one
-active inbox watcher per served workspace; claim ids are local leases that
-prevent stale recordings and let abandoned claims expire, not a distributed lock
-for multiple simultaneous watchers. Active-agent mode and the inbox commands use
-the same `--agent-policy`,
-`--agent-trigger`, `--agent-state`, `--agent-max-attempts`, and
-`--agent-max-passes` semantics as `--agent`.
+Use repeated `tunelito inbox next ./site` calls for non-blocking manual checks
+from an agent shell. Use `tunelito inbox watch ./site` only when you need the
+one-shot waiting primitive without a running `--agent-session` server; if you use
+`watch`, make the host command timeout longer than Tunelito's `--timeout`, or the
+agent shell may kill the wait first. Use repeated `--file`, `--completed`, and
+`--remaining` flags when recording multi-file work or `needs_followup`.
+
+Run one active inbox claimer per served workspace. A foreground `inbox next` or
+`inbox watch` call against a workspace already served with `--agent-session` is
+another claimer, not a harmless read. Claim ids are local leases that prevent
+stale recordings and let abandoned claims expire, not a distributed lock. If you
+need to resolve the comment owned by the current active claim, use `--claim auto`
+instead of editing `.tunelito/agent/state.json` by hand. Active-agent mode and the
+inbox commands use the same `--agent-policy`, `--agent-trigger`, `--agent-state`,
+`--agent-max-attempts`, and `--agent-max-passes` semantics as `--agent`.
+
+Before declaring a review pass complete, verify there is no unhandled work:
+
+```bash
+tunelito comments inspect ./site --json
+tunelito inbox status ./site
+```
+
+For a direct Markdown inbox, pass the ledger path explicitly:
+
+```bash
+tunelito comments inspect ./site.comments.md --agent-state ./site/.tunelito/agent/state.json --json
+```
 
 When the reviewer wants to finish a batch before the agent starts, use the
 server-printed handoff command:
@@ -288,7 +312,8 @@ are Tunelito's data store and ledger, not your edit targets.
 - If you used `--agent`, point the user at `.tunelito/agent/log.md` for the
   human-readable record of what the worker did. If you used `--agent-session`,
   summarize the `tunelito inbox record` statuses you wrote and the current
-  `tunelito inbox status` tracker.
+  `tunelito inbox status` tracker. Confirm zero unhandled comments before saying
+  the review pass is done.
 
 ## Safety and non-negotiables
 
@@ -335,6 +360,10 @@ are Tunelito's data store and ledger, not your edit targets.
 | `mention`/`owner-or-mention` with `--agent-trigger all` | The server refuses to start -- these policies require a real trigger marker. |
 | Using `--live` then expecting a record | Nothing is written to disk; the comments are gone on restart, and `--agent` won't run. |
 | Editing `*.comments.md` or `.tunelito/` directly | Corrupts the inbox/ledger Tunelito round-trips; let the tool own them. |
+| Restarting the server after a tab closes | The original URL/key stay valid while the server runs; reopen the same URL instead. |
+| Running foreground `inbox next/watch` while `--agent-session` is already watching | Creates another claimer against the same workspace; use one claimer or recover with the visible claim id / `--claim auto`. |
+| Letting `inbox watch` outlive the host shell timeout | The agent shell may kill the wait before Tunelito's `--timeout`; prefer repeated `inbox next` or raise the host timeout. |
+| Declaring done without checking pending status | Later comments can still be unhandled; verify `inbox status` or `comments inspect --json` first. |
 | Mass-editing every page from one vague `site`-scope note | `site` means "shown everywhere," not "edit everywhere"; apply only where it fits, else ask. |
 | Refusing to edit HTML for a review comment | That is the intended workflow; the "untouched" rule is about injection only. |
 | Inventing flags not in `tunelito --help` | They silently do nothing or error; confirm against the CLI. |
@@ -357,6 +386,7 @@ highlight may not reattach -- the note is not lost, only its anchor.
 | Review sensitive data locally | `tunelito ./report.html --no-tunnel --open` |
 | Throwaway live session, kept private | `tunelito ./mockup.html --live --no-tunnel` |
 | Watch comments from the current agent session | `tunelito ./site --agent-session` |
+| Check pending/unhandled status | `tunelito comments inspect ./site --json` or `tunelito inbox status ./site` |
 | Auto-apply comments live, scoped | `tunelito ./site --owner "Me" --agent claude --agent-policy owner-or-mention --agent-trigger "@agent"` |
 | Custom agent CLI | `tunelito ./site --agent custom --agent-command "<your cli>"` |
 | Pick a port / open browser | `--port 4318` / `--open` |
