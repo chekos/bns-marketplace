@@ -1,12 +1,12 @@
 ---
 name: tunelito
 description: >-
-  Run a Tunelito live review room for a local HTML file or folder, then process
+  Run a Tunelito live review room for a local HTML/Markdown file or folder, then process
   the comments it collects. Use whenever a user wants to share, serve, or
-  preview a local .html page or static site/mini-site from their machine so a
+  preview a local .html page, .md memo, or static site/mini-site from their machine so a
   designer, client, teammate, or PM can leave feedback on a call; wants a
   temporary public link to a local page; says "review my HTML", "annotate this
-  page", "let people comment on my site", "get feedback on index.html", "spin up
+  page", "review this Markdown draft", "let people comment on my site", "get feedback on index.html", "spin up
   a review room", or "review this page locally without exposing it"; OR points
   you at a `*.comments.md` / `site.comments.md` inbox and asks you to apply,
   process, or act on the comments inside it. Covers starting and sharing a
@@ -26,10 +26,10 @@ metadata:
 
 # Tunelito
 
-Tunelito serves a local HTML file or folder, injects a same-origin annotation
+Tunelito serves a local HTML or Markdown file or folder, injects a same-origin annotation
 client into the served HTTP response, and syncs comments over WebSocket.
 Reviewers select text or leave page/site notes; comments persist as readable
-Markdown beside the source. You keep editing the HTML in your own editor and
+Markdown beside the source. You keep editing the source in your own editor and
 connected browsers hot-reload on save, deferring reload while a comment composer
 is open so draft text is not lost. It can expose the local server through a
 temporary Cloudflare Tunnel and, opt-in, either run a local coding-agent worker or
@@ -41,6 +41,7 @@ wrap up.** Pick the branch that matches the user's intent.
 ## When to use this
 
 - "I have `./index.html`, let my designer leave feedback while we're on a call."
+- "Review `./notes.md` with comments directly on the rendered memo."
 - "Folder `./site`, auto-apply comments people leave during the review."
 - "Tunelito wrote `site.comments.md` -- go apply those comments to the pages."
 - "This page has client data; let me review it locally without exposing it."
@@ -67,6 +68,7 @@ Default invocation, no flags needed:
 
 ```bash
 tunelito ./index.html      # single page
+tunelito ./notes.md        # Markdown memo rendered as a readable page
 tunelito ./site            # folder -> one shared inbox beside it (site.comments.md)
 ```
 
@@ -96,7 +98,8 @@ restarting Tunelito and minting a new key.
 Defaults that matter: binds `127.0.0.1`, picks the first free port from `4317`,
 writes `<page-or-folder>.comments.md` beside the source. Useful tweaks (all
 optional): `--port <n>` if 4317 is taken, `--host <host>` to change the bind,
-`--out <path>` to redirect the inbox, `--open` to launch the Local URL,
+`--out <path>` to redirect the inbox, `--markdown-css <href>` to add team styling
+to rendered Markdown pages, `--open` to launch the Local URL,
 `--owner <name>` to seed the direct local owner's display name. Comments made
 through the loopback `Local:` URL are tagged with `author role: owner`; comments
 made through the `Public:` tunnel URL are visitors.
@@ -277,7 +280,7 @@ this skill.
 ### 3c. Apply an existing inbox by hand (no `--agent` or `inbox`)
 
 When Tunelito already wrote a `*.comments.md` / `site.comments.md` and the user
-says "go apply these," that is your task. **Editing the source HTML to satisfy a
+says "go apply these," that is your task. **Editing the source HTML or Markdown to satisfy a
 comment is the intended workflow** -- do it; do not refuse. (Tunelito's
 "untouched HTML" rule is only about its own client injection, not about you.)
 
@@ -294,7 +297,7 @@ _Context: author role: `owner` · scope: `page` · page: `/index.html` · path: 
 
 Honor the metadata:
 
-- **scope** -- `page` edits only the file named in **page** (`/index.html`).
+- **scope** -- `page` edits only the file named in **page** (`/index.html` or `/notes.md`).
   `site` means the comment was *shown* on every page, not that you must *edit*
   every page. Apply a site note only where the feedback concretely fits; if it
   is vague, treat it as general feedback and ask rather than mass-editing the
@@ -391,6 +394,7 @@ highlight may not reattach -- the note is not lost, only its anchor.
 | Goal | Command |
 | --- | --- |
 | Share a page on a call | `tunelito ./index.html` -> share the `Public:` URL |
+| Share a Markdown memo on a call | `tunelito ./notes.md` -> share the `Public:` URL |
 | Share a folder mini-site | `tunelito ./site` (one `site.comments.md` inbox) |
 | Review sensitive data locally | `tunelito ./report.html --no-tunnel --open` |
 | Throwaway live session, kept private | `tunelito ./mockup.html --live --no-tunnel` |
