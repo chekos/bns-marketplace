@@ -68,7 +68,7 @@ Default invocation, no flags needed:
 
 ```bash
 tunelito ./index.html      # single page
-tunelito ./notes.md        # Markdown memo rendered as a readable page
+tunelito ./notes.md        # Markdown memo; Mermaid fences render as diagrams
 tunelito ./site            # folder -> one shared inbox beside it (site.comments.md)
 ```
 
@@ -103,6 +103,8 @@ to rendered Markdown pages, `--open` to launch the Local URL,
 `--owner <name>` to seed the direct local owner's display name. Comments made
 through the loopback `Local:` URL are tagged with `author role: owner`; comments
 made through the `Public:` tunnel URL are visitors.
+
+Markdown `mermaid` fences render automatically from Tunelito's packaged same-origin runtime. Other code fences remain source code. Invalid diagrams retain an escaped, readable source fallback, so do not build separate HTML merely to preview a Markdown diagram.
 
 ## Step 2 -- Share it safely
 
