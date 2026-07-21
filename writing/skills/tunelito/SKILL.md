@@ -20,6 +20,7 @@ license: MIT
 compatibility: Requires Node.js 22 or newer. Public sharing uses a temporary Cloudflare Tunnel when available.
 metadata:
   package: tunelito
+  version: __TUNELITO_VERSION__
   install: npx --yes tunelito ./page.html
   skill: npx --yes tunelito skill show
 ---
@@ -87,7 +88,7 @@ Access:   review key required by the printed URLs
 Public:   https://<random>.trycloudflare.com/?tunelito_key=...   # share THIS
 ```
 
-`Public:` is the only shareable URL. `Live:` (printed with `--live`) is a
+`Public:` is the only shareable URL. `Live:` (printed with `--ephemeral`) is a
 **transport status line** ("WebRTC peer-to-peer when available; WebSocket relay
 fallback enabled"), not a URL -- never hand it to a reviewer.
 
@@ -140,7 +141,7 @@ tunelito ./report.html --no-tunnel --open
 
 `--no-tunnel` prints only the `Local:` URL and never starts the Cloudflare
 Tunnel, so the session stays on `127.0.0.1` with no public exposure. This is the
-flag that controls exposure -- not `--no-auth`, and not `--live`.
+flag that controls exposure -- not `--no-auth`, and not `--ephemeral`.
 
 ## Step 3 -- Process the comments
 
@@ -164,8 +165,8 @@ tunelito ./site --owner "Reviewer Lead" \
   --agent-policy owner-or-mention --agent-trigger "@agent"
 ```
 
-`--agent-session` writes `.tunelito/session.json`; it does not run a nested
-worker. The same Tunelito server process watches the persistent comments
+Every served target writes an atomic, private `.tunelito/session.json`.
+`--agent-session` does not run a nested worker. The same Tunelito server process watches the persistent comments
 Markdown, keeps interval polling as fallback, claims the next actionable comment
 in `.tunelito/agent/state.json`, prints a prompt with the matching claim id, and
 pauses further claims until that claim is recorded or expires. The browser
@@ -176,10 +177,56 @@ the matching source files, then record the result:
 tunelito inbox record ./site --id c_... --claim claim_... --status resolved --summary "Updated hero copy." --file index.html
 ```
 
+#### Keep the owning turn attached
+
+Starting a background `--agent-session` process delivers and claims comments,
+but background stdout alone does not wake a coding-agent conversation that has
+already returned its final response. If you tell the user you will remain
+attached during a live review, keep the current turn open:
+
+1. Start Tunelito in a foreground PTY.
+2. Send the review URL as an intermediate update, not the final response.
+3. Poll that PTY with bounded waits of at most 60 seconds and stay quiet when
+   nothing changes.
+4. When Tunelito prints a claim, edit the source and record the exact claim id.
+5. Resume bounded waits only while the user still wants an active review.
+
+The Tunelito server is the only claimer in this lifecycle. Do not run `inbox
+next` or `inbox watch` beside it. If the host supports a lifecycle hook that
+continues the same turn, the hook may observe the already-persisted
+`agent-session` claim, but it must be bounded, cancellable, and guarded against
+recursive stop-hook loops.
+
+If the user sends another message during the wait, treat it as steering,
+cancellation, or an addition to the active request before waiting again. After
+an interrupt or context compaction, run `tunelito session status ./site` and
+inspect the durable tracker; do not edit agent transcripts or `.tunelito/`
+state. When the review ends, stop the PTY with Ctrl-C and verify session status
+reports `stopped`.
+
+Be precise about host limits: Codex and Claude offer supported continuation and
+lifecycle mechanisms, but a local background process is not automatically an
+external wake API for every completed desktop task. If the host cannot keep the
+owning turn attached, tell the user and choose explicitly between durable
+collection for later and the separate unattended `--agent codex|claude`
+worker.
+
 Use `tunelito inbox status ./site` to inspect the same work tracker in the
 terminal. It prints pending and claimed comment work as unchecked tasks, includes
 the active claim id for claimed work, and prints completed work as checked,
 crossed-out tasks.
+
+Before reaching for `ps`, `lsof`, or the metadata file directly, recover the
+session through its supported status surface:
+
+```bash
+tunelito session status ./site
+tunelito session status ./site --json
+```
+
+This verifies the listener against the saved session identity and reports the
+review URL, persistence, agent state, active claims, unhandled count, tunnel
+health, viewers, timestamps, and suggested recovery or stop action.
 
 Use repeated `tunelito inbox next ./site` calls for non-blocking manual checks
 from an agent shell. Use `tunelito inbox watch ./site` only when you need the
@@ -338,11 +385,11 @@ are Tunelito's data store and ledger, not your edit targets.
   the tunnel is controlled separately by `--no-tunnel`. `--no-auth` on a default
   (tunneled) run publishes an *ungated* public URL anyone can open and edit. If
   the user wants no key, pair it with `--no-tunnel`, or just use `--no-tunnel`.
-- **`--live` changes persistence, not exposure.** It only stops writing to disk;
-  a `--live` session still serves over the same Cloudflare Tunnel and bearer key.
+- **`--ephemeral` changes persistence, not exposure.** It only stops writing to disk;
+  an `--ephemeral` session still serves over the same Cloudflare Tunnel and bearer key.
   "Nothing saved" is **not** "nothing exposed" -- for a sensitive/confidential
-  page, combine `--live` with `--no-tunnel` (or skip `--live` and review locally).
-- **`--live` keeps nothing.** It is ephemeral real-time collaboration: no
+  page, combine `--ephemeral` with `--no-tunnel` (or skip `--ephemeral` and review locally).
+- **`--ephemeral` keeps nothing.** It is real-time collaboration without persistence: no
   Markdown is written and no agent worker runs, so a restart loses everything,
   and it cannot be combined with `--agent` (no persistent inbox). Use it only for
   a throwaway live session where no record is wanted.
@@ -366,16 +413,18 @@ are Tunelito's data store and ledger, not your edit targets.
 | Sharing the `Live:` line as a link | It is a transport status string, not a URL; the reviewer still needs the `Public:` URL. |
 | Treating the keyed URL as private or "authenticated per person" | It is a shared bearer token -- forwarding it hands over full view + comment rights. |
 | `--no-auth` without `--no-tunnel` | Publishes an ungated public URL anyone can open and edit; `--no-auth` does not disable the tunnel. |
-| Assuming `--live` is private because nothing is saved | `--live` only changes persistence; it still serves over the same tunnel and bearer key. Add `--no-tunnel` for sensitive pages. |
+| Assuming `--ephemeral` is private because nothing is saved | `--ephemeral` only changes persistence; it still serves over the same tunnel and bearer key. Add `--no-tunnel` for sensitive pages. |
 | Tunneling a page with sensitive/client data | A public URL exposes the data; use `--no-tunnel`. |
 | `--agent --agent-policy all` on a shared call | Any guest comment becomes a local code-edit instruction; scope to owner/mention. |
 | Spawning `--agent` from inside an existing agent session | Creates a nested agent and hides the loop; use `--agent-session` so the serving process watches comments for the current session. |
 | Promising owner-only edits while the owner uses the `Public:` link | Owner policy only matches the direct loopback `Local:` session; via the public link they count as a visitor and never match. |
 | `mention`/`owner-or-mention` with `--agent-trigger all` | The server refuses to start -- these policies require a real trigger marker. |
-| Using `--live` then expecting a record | Nothing is written to disk; the comments are gone on restart, and `--agent` won't run. |
+| Using `--ephemeral` then expecting a record | Nothing is written to disk; the comments are gone on restart, and `--agent` won't run. |
 | Editing `*.comments.md` or `.tunelito/` directly | Corrupts the inbox/ledger Tunelito round-trips; let the tool own them. |
 | Restarting the server after a tab closes | The original URL/key stay valid while the server runs; reopen the same URL instead. |
 | Running foreground `inbox next/watch` while `--agent-session` is already watching | Creates another claimer against the same workspace; use one claimer or recover with the visible claim id / `--claim auto`. |
+| Returning a final response while promising `--agent-session` is still attached | The server can claim and print new work, but background stdout may not wake the completed host task; keep the turn active with bounded waits or state the fallback mode. |
+| Using an unbounded Stop hook to wait for comments | Can create recursive continuations or a hot loop; check the host's stop-hook guard, use bounded waits, and make cancellation explicit. |
 | Letting `inbox watch` outlive the host shell timeout | The agent shell may kill the wait before Tunelito's `--timeout`; prefer repeated `inbox next` or raise the host timeout. |
 | Declaring done without checking pending status | Later comments can still be unhandled; verify `inbox status` or `comments inspect --json` first. |
 | Mass-editing every page from one vague `site`-scope note | `site` means "shown everywhere," not "edit everywhere"; apply only where it fits, else ask. |
@@ -399,7 +448,7 @@ highlight may not reattach -- the note is not lost, only its anchor.
 | Share a Markdown memo on a call | `tunelito ./notes.md` -> share the `Public:` URL |
 | Share a folder mini-site | `tunelito ./site` (one `site.comments.md` inbox) |
 | Review sensitive data locally | `tunelito ./report.html --no-tunnel --open` |
-| Throwaway live session, kept private | `tunelito ./mockup.html --live --no-tunnel` |
+| Throwaway live session, kept private | `tunelito ./mockup.html --ephemeral --no-tunnel` |
 | Watch comments from the current agent session | `tunelito ./site --agent-session` |
 | Check pending/unhandled status | `tunelito comments inspect ./site --json` or `tunelito inbox status ./site` |
 | Auto-apply comments live, scoped | `tunelito ./site --owner "Me" --agent claude --agent-policy owner-or-mention --agent-trigger "@agent"` |
@@ -410,7 +459,7 @@ highlight may not reattach -- the note is not lost, only its anchor.
 ## Agent worker reference
 
 Long-tail detail for `--agent`. The worker is opt-in and runs only with
-`--agent` or `--agent-command`, never under `--live`. Treat it as trusted local
+`--agent` or `--agent-command`, never under `--ephemeral`. Treat it as trusted local
 code execution: every reviewer comment that reaches the worker becomes an
 instruction to a process that edits files under the served root.
 
