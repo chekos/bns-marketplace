@@ -107,6 +107,8 @@ made through the `Public:` tunnel URL are visitors.
 
 Markdown `mermaid` fences render automatically from Tunelito's packaged same-origin runtime. Other code fences remain source code. Invalid diagrams retain an escaped, readable source fallback, so do not build separate HTML merely to preview a Markdown diagram.
 
+Defined GFM footnotes render automatically as numbered two-way links, including repeated references. Keep footnotes in the source Markdown rather than converting them to hand-written HTML; definitions remain commentable and the source file stays unchanged.
+
 ## Step 2 -- Share it safely
 
 Hand the reviewer the **`Public:`** URL, not the `Local:` one (`127.0.0.1` is
