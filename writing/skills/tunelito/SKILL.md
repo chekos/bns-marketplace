@@ -77,13 +77,15 @@ A folder shares **one** inbox: `site/` -> `site.comments.md`. Page-scoped
 comments appear only on their page; site-scoped comments appear on every page.
 If it is not installed, prefix with `npx --yes` (e.g. `npx --yes tunelito ./index.html`).
 
-Startup prints `Local:`, `Comments:`, and `Access:` always, plus `Owner:`,
-`Agent:`, `Live:`, and `Public:` lines when those flags are set. Read them back
-and act on them:
+Startup prints `Local:`, `Theme:`, `Comments:`, `Handoff:`, and `Access:`
+always, plus `Owner:`, `Agent:`, `Session:`, `Live:`, and `Public:` lines when
+those modes are active. Read them back and act on them:
 
 ```text
 Local:    http://127.0.0.1:4317/?tunelito_key=...   # you, on this machine
+Theme:    bns-pitaya (default)                       # resolved Markdown presentation
 Comments: /path/to/index.html.comments.md           # where notes land
+Handoff:  tunelito review watch --url "..."          # optional batch-complete wait
 Access:   review key required by the printed URLs
 Public:   https://<random>.trycloudflare.com/?tunelito_key=...   # share THIS
 ```
@@ -105,9 +107,42 @@ to rendered Markdown pages, `--open` to launch the Local URL,
 through the loopback `Local:` URL are tagged with `author role: owner`; comments
 made through the `Public:` tunnel URL are visitors.
 
-Markdown `mermaid` fences render automatically from Tunelito's packaged same-origin runtime. Other code fences remain source code. Invalid diagrams retain an escaped, readable source fallback, so do not build separate HTML merely to preview a Markdown diagram.
+Markdown documents and generated folder pages use dark-only `bns-pitaya` when
+no CLI, project, or global theme is configured. If presentation matters, inspect
+the resolved layers before serving:
 
-Defined GFM footnotes render automatically as numbered two-way links, including repeated references. Keep footnotes in the source Markdown rather than converting them to hand-written HTML; definitions remain commentable and the source file stays unchanged.
+```bash
+tunelito config show ./notes.md
+```
+
+Use `--theme default` for Tunelito's neutral light/dark surface. CLI flags
+override project config, which overrides global config and then built-in
+defaults. `config show` is read-only; do not create or edit
+`tunelito.config.json` merely to start a review unless the user asked to persist
+that presentation choice.
+
+### Markdown review behavior
+
+Markdown `mermaid` fences render automatically from Tunelito's packaged
+same-origin runtime. Other code fences remain source code. Invalid diagrams
+retain an escaped, readable source fallback, so do not build separate HTML
+merely to preview a Markdown diagram.
+
+Defined GFM footnotes render automatically as numbered two-way links, including
+repeated references. Keep footnotes in the source Markdown rather than
+converting them to hand-written HTML; definitions remain commentable and the
+source file stays unchanged. When applying feedback, edit the source footnote
+reference or definition, never the generated number, footnotes section, or
+back-link.
+
+Complete Markdown HTML comments are author-only source notes and do not appear
+on the rendered review surface. Raw HTML remains escaped except for native
+`<details>` and `<summary>` disclosures; Tunelito strips all attributes except a
+normalized boolean `open` on `<details>`.
+
+Properties, folder navigation, document-map controls, Mermaid canvases, and
+footnote numbering/back-links are presentation-only chrome. Apply comments to
+the matching source Markdown content, not generated markup or UI.
 
 ## Step 2 -- Share it safely
 
@@ -178,6 +213,14 @@ the matching source files, then record the result:
 ```bash
 tunelito inbox record ./site --id c_... --claim claim_... --status resolved --summary "Updated hero copy." --file index.html
 ```
+
+`needs_followup` means the agent made implementation progress and has bounded
+remaining work for another agent pass. It is not a question or reply to the
+reviewer. Tunelito does not yet provide an in-room agent-to-reviewer
+clarification thread. If feedback requires a human decision, do not guess:
+record `blocked` (or `partial` when safe work was completed) with a concise
+summary, then ask through the owning host conversation. Leave the undecided
+source unchanged until the reviewer answers.
 
 #### Keep the owning turn attached
 
@@ -395,6 +438,12 @@ are Tunelito's data store and ledger, not your edit targets.
   Markdown is written and no agent worker runs, so a restart loses everything,
   and it cannot be combined with `--agent` (no persistent inbox). Use it only for
   a throwaway live session where no record is wanted.
+- **Ephemeral sessions cannot be promoted in place.** There is no supported
+  `session persist` command or automatic transfer from in-memory comments to a
+  persistent inbox. Do not invent one. If retention becomes important, explain
+  that the existing ephemeral comments will not transfer, then ask whether to
+  continue the throwaway session or stop it and restart in default persistent
+  mode.
 - **`--agent` runs real code from reviewer input.** Fine for your own trusted
   session; on a shared call scope it with `--owner` + `--agent-policy
   owner-or-mention` + a real `--agent-trigger`, never bare `--agent-policy all`.
@@ -422,7 +471,10 @@ are Tunelito's data store and ledger, not your edit targets.
 | Promising owner-only edits while the owner uses the `Public:` link | Owner policy only matches the direct loopback `Local:` session; via the public link they count as a visitor and never match. |
 | `mention`/`owner-or-mention` with `--agent-trigger all` | The server refuses to start -- these policies require a real trigger marker. |
 | Using `--ephemeral` then expecting a record | Nothing is written to disk; the comments are gone on restart, and `--agent` won't run. |
+| Inventing `session persist` for an ephemeral review | Tunelito cannot promote or transfer the in-memory comments; explain the loss boundary and restart in persistent mode only with the user's choice. |
 | Editing `*.comments.md` or `.tunelito/` directly | Corrupts the inbox/ledger Tunelito round-trips; let the tool own them. |
+| Using `needs_followup` to ask the reviewer a question | It schedules another agent pass, not a reviewer reply. Record `blocked` or `partial` and ask in the owning host conversation. |
+| Editing generated footnote, Properties, navigation, or document-map markup | Those are presentation-only; edit the matching source Markdown content. |
 | Restarting the server after a tab closes | The original URL/key stay valid while the server runs; reopen the same URL instead. |
 | Running foreground `inbox next/watch` while `--agent-session` is already watching | Creates another claimer against the same workspace; use one claimer or recover with the visible claim id / `--claim auto`. |
 | Returning a final response while promising `--agent-session` is still attached | The server can claim and print new work, but background stdout may not wake the completed host task; keep the turn active with bounded waits or state the fallback mode. |
@@ -449,6 +501,8 @@ highlight may not reattach -- the note is not lost, only its anchor.
 | Share a page on a call | `tunelito ./index.html` -> share the `Public:` URL |
 | Share a Markdown memo on a call | `tunelito ./notes.md` -> share the `Public:` URL |
 | Share a folder mini-site | `tunelito ./site` (one `site.comments.md` inbox) |
+| Inspect resolved presentation | `tunelito config show ./notes.md` |
+| Use the neutral light/dark theme | `tunelito ./notes.md --theme default` |
 | Review sensitive data locally | `tunelito ./report.html --no-tunnel --open` |
 | Throwaway live session, kept private | `tunelito ./mockup.html --ephemeral --no-tunnel` |
 | Watch comments from the current agent session | `tunelito ./site --agent-session` |
