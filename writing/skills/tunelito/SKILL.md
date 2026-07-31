@@ -11,7 +11,8 @@ description: >-
   you at a `*.comments.md` / `site.comments.md` inbox and asks you to apply,
   process, or act on the comments inside it. Covers starting and sharing a
   session (Cloudflare Tunnel, keyed bearer URLs), local-only review of sensitive
-  pages, active-agent `tunelito inbox` commands, the opt-in `--agent` worker
+  pages, opt-in local-owner Markdown source editing with `--editable`, active-agent
+  `tunelito inbox` commands, the opt-in `--agent` worker
   that edits files from comments, and the comment Markdown schema (scope, page,
   path, id, status). Do NOT use for
   reviewing a pull request, IDE inline comments, reviewing source code for bugs,
@@ -30,9 +31,10 @@ metadata:
 Tunelito serves a local HTML or Markdown file or folder, injects a same-origin annotation
 client into the served HTTP response, and syncs comments over WebSocket.
 Reviewers select text or leave page/site notes; comments persist as readable
-Markdown beside the source. You keep editing the source in your own editor and
-connected browsers hot-reload on save, deferring reload while a comment composer
-is open so draft text is not lost. It can expose the local server through a
+Markdown beside the source. You can keep editing the source in your own editor,
+or opt into the direct-local browser editor for Markdown with `--editable`.
+Connected browsers hot-reload on save, deferring reload while a comment composer
+or source draft is open so draft text is not lost. It can expose the local server through a
 temporary Cloudflare Tunnel and, opt-in, either run a local coding-agent worker or
 expose inbox commands for the current agent session to satisfy comments.
 
@@ -79,7 +81,8 @@ If it is not installed, prefix with `npx --yes` (e.g. `npx --yes tunelito ./inde
 
 Startup prints `Local:`, `Theme:`, `Comments:`, `Handoff:`, and `Access:`
 always, plus `Owner:`, `Agent:`, `Session:`, `Live:`, and `Public:` lines when
-those modes are active. Read them back and act on them:
+those modes are active. An `Editing:` line also appears with `--editable`. Read
+them back and act on them:
 
 ```text
 Local:    http://127.0.0.1:4317/?tunelito_key=...   # you, on this machine
@@ -87,6 +90,7 @@ Theme:    bns-pitaya (default)                       # resolved Markdown present
 Comments: /path/to/index.html.comments.md           # where notes land
 Handoff:  tunelito review watch --url "..."          # optional batch-complete wait
 Access:   review key required by the printed URLs
+Editing:  direct local owner only; public links remain read-only
 Public:   https://<random>.trycloudflare.com/?tunelito_key=...   # share THIS
 ```
 
@@ -103,7 +107,8 @@ writes `<page-or-folder>.comments.md` beside the source. Useful tweaks (all
 optional): `--port <n>` if 4317 is taken, `--host <host>` to change the bind,
 `--out <path>` to redirect the inbox, `--markdown-css <href>` to add team styling
 to rendered Markdown pages, `--open` to launch the Local URL,
-`--owner <name>` to seed the direct local owner's display name. Comments made
+`--owner <name>` to seed the direct local owner's display name, and `--editable`
+to let that owner edit safely served Markdown source in the browser. Comments made
 through the loopback `Local:` URL are tagged with `author role: owner`; comments
 made through the `Public:` tunnel URL are visitors.
 
@@ -144,6 +149,30 @@ Properties, folder navigation, document-map controls, Mermaid canvases, and
 footnote numbering/back-links are presentation-only chrome. Apply comments to
 the matching source Markdown content, not generated markup or UI.
 
+### Local Markdown source editing
+
+Use `--editable` only when the person at the direct loopback `Local:` URL should
+be able to change the Markdown source from its rendered review page:
+
+```bash
+tunelito ./notes.md --editable --no-tunnel --open
+```
+
+The editor loads and saves the exact UTF-8 Markdown bytes; it does not round-trip
+the rendered HTML. Saving is explicit, preserves the existing file mode, and
+uses the revision loaded by the browser and optimistically rechecks it immediately
+before replacement. If Tunelito observes another editor changed the file first,
+it refuses the stale save and keeps the browser draft for recovery.
+Closing or pressing Escape also requires an explicit discard while the draft is
+dirty. Files larger than 2 MiB, non-UTF-8 files, generated folder pages,
+`*.comments.md`, hidden/internal paths, and sources outside the served root are
+not editable.
+
+This capability never crosses a public or forwarded connection: the editor is
+not rendered there, and its source endpoint rejects both reads and writes. A
+`tunelito_key`, `--no-auth`, `--host`, or knowing the endpoint does not grant
+source-edit authority. Keep using the public URL for view + comment review.
+
 ## Step 2 -- Share it safely
 
 Hand the reviewer the **`Public:`** URL, not the `Local:` one (`127.0.0.1` is
@@ -162,7 +191,7 @@ present it as account authentication.
 **Never pass `--no-auth` while a tunnel is active.** `--no-auth` and the tunnel
 are **independent** -- `--no-auth` only removes the key gate; it does NOT turn
 off the Cloudflare Tunnel. So `tunelito ./page.html --no-auth` still publishes a
-public URL, now with no key at all: anyone who finds it can view and edit. If
+public URL, now with no key at all: anyone who finds it can view and comment. If
 the user wants no key, they almost always mean local-only -- add `--no-tunnel`.
 Reach for `--no-auth` only on a trusted local network or a throwaway demo, and
 warn the user first.
@@ -426,9 +455,13 @@ are Tunelito's data store and ledger, not your edit targets.
 - **Public links are bearer access.** The `tunelito_key` in a shared URL grants
   view + comment to anyone who holds it. Keep sessions keyed (the default); only
   use `--no-auth` on trusted/local networks, and stop the session when done.
+- **`--editable` is a direct-local capability.** It exposes exact Markdown
+  source only to the owner browser on the direct loopback connection. Public
+  and forwarded requests remain read-only and cannot call the source endpoint,
+  even with the review key or `--no-auth`.
 - **`--no-auth` does not make a session local.** It only removes the key gate;
   the tunnel is controlled separately by `--no-tunnel`. `--no-auth` on a default
-  (tunneled) run publishes an *ungated* public URL anyone can open and edit. If
+  (tunneled) run publishes an *ungated* public URL anyone can open and comment on. If
   the user wants no key, pair it with `--no-tunnel`, or just use `--no-tunnel`.
 - **`--ephemeral` changes persistence, not exposure.** It only stops writing to disk;
   an `--ephemeral` session still serves over the same Cloudflare Tunnel and bearer key.
@@ -463,7 +496,8 @@ are Tunelito's data store and ledger, not your edit targets.
 | Sharing the `Local:` URL instead of `Public:` | `127.0.0.1` is unreachable for the remote reviewer; they see nothing. |
 | Sharing the `Live:` line as a link | It is a transport status string, not a URL; the reviewer still needs the `Public:` URL. |
 | Treating the keyed URL as private or "authenticated per person" | It is a shared bearer token -- forwarding it hands over full view + comment rights. |
-| `--no-auth` without `--no-tunnel` | Publishes an ungated public URL anyone can open and edit; `--no-auth` does not disable the tunnel. |
+| `--no-auth` without `--no-tunnel` | Publishes an ungated public URL anyone can open and comment on; `--no-auth` does not disable the tunnel. |
+| Assuming the key or `--no-auth` grants source editing | `--editable` is enforced separately and only for the direct loopback owner; public and forwarded requests stay read-only. |
 | Assuming `--ephemeral` is private because nothing is saved | `--ephemeral` only changes persistence; it still serves over the same tunnel and bearer key. Add `--no-tunnel` for sensitive pages. |
 | Tunneling a page with sensitive/client data | A public URL exposes the data; use `--no-tunnel`. |
 | `--agent --agent-policy all` on a shared call | Any guest comment becomes a local code-edit instruction; scope to owner/mention. |
@@ -492,7 +526,8 @@ are not annotatable -- if a user wants feedback on those, have them add nearby
 text or leave a page note. Strict in-page CSP `<meta>` tags are stripped from
 the **served response** (not the disk file) so the client can run. If the exact
 commented text later changes, the comment stays in the Markdown/sidebar but its
-highlight may not reattach -- the note is not lost, only its anchor.
+highlight may not reattach. The sidebar labels it "Selection no longer found in
+this version" -- the note is not lost, only its anchor.
 
 ## Quick reference
 
@@ -500,6 +535,7 @@ highlight may not reattach -- the note is not lost, only its anchor.
 | --- | --- |
 | Share a page on a call | `tunelito ./index.html` -> share the `Public:` URL |
 | Share a Markdown memo on a call | `tunelito ./notes.md` -> share the `Public:` URL |
+| Edit Markdown from the local review page | `tunelito ./notes.md --editable --no-tunnel --open` |
 | Share a folder mini-site | `tunelito ./site` (one `site.comments.md` inbox) |
 | Inspect resolved presentation | `tunelito config show ./notes.md` |
 | Use the neutral light/dark theme | `tunelito ./notes.md --theme default` |
