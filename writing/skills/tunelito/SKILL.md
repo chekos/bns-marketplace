@@ -149,6 +149,15 @@ Properties, folder navigation, document-map controls, Mermaid canvases, and
 footnote numbering/back-links are presentation-only chrome. Apply comments to
 the matching source Markdown content, not generated markup or UI.
 
+A heading or list item may end with an explicit `{#id}`. Tunelito records that
+id, or the nearest heading id, on each new comment and uses it when the quote
+no longer matches. `{todo}` and `{high}` render as pills outside code. H2 and
+H3 sections can be folded in the browser without changing the source.
+`--section-index` shows a sticky section list on wide viewports. The document
+map selects the first block at the top and the last block at the bottom.
+Resolved comment cards can be hidden. The recorded agent summary stays on the
+card.
+
 ### Local Markdown source editing
 
 Use `--editable` only when the person at the direct loopback `Local:` URL should
