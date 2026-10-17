@@ -153,6 +153,16 @@ title, such as `[TLL-1](url "Title · status · priority")`, shows on hover, so
 put tracker context in the title when writing briefings. Fenced code blocks get
 a copy button; it is presentation-only chrome.
 
+For bare tracker links, a resolver can fill the hover card instead:
+`--link-preview '<regex>' '<json-url-template>'` (optionally
+`--link-preview-fields title=…,status=…,priority=…`). It is loopback-only and
+owner-only by default. Add `--link-preview-allow-remote` or
+`--link-preview-visitors` only when the user explicitly asks for that. For a
+tracker that needs a token, use
+`--link-preview-header 'Authorization: Bearer ${env:TRACKER_TOKEN}'` plus
+`--link-preview-env TRACKER_TOKEN`. Never put a literal token on the command
+line or in `tunelito.config.json`, and never echo the variable's value.
+
 Complete Markdown HTML comments are author-only source notes and do not appear
 on the rendered review surface. Raw HTML remains escaped except for native
 `<details>` and `<summary>` disclosures; Tunelito strips all attributes except a
