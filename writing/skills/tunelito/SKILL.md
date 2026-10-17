@@ -94,6 +94,13 @@ Editing:  direct local owner only; public links remain read-only
 Public:   https://<random>.trycloudflare.com/?tunelito_key=...   # share THIS
 ```
 
+A fresh Quick Tunnel can take up to about two minutes to route while DNS
+propagates. `Public:  waiting for DNS to propagate...` is progress, not
+failure: keep the process running and do not restart it or start a second
+tunnel. Share only the final keyed `Public:` URL. If verification times out,
+the message names the cause code (`ENOTFOUND`, a TLS error, `HTTP_<status>`,
+or `MISSING_MARKER`); report it rather than retrying in a loop.
+
 `Public:` is the only shareable URL. `Live:` (printed with `--ephemeral`) is a
 **transport status line** ("WebRTC peer-to-peer when available; WebSocket relay
 fallback enabled"), not a URL -- never hand it to a reviewer.
@@ -139,6 +146,12 @@ converting them to hand-written HTML; definitions remain commentable and the
 source file stays unchanged. When applying feedback, edit the source footnote
 reference or definition, never the generated number, footnotes section, or
 back-link.
+
+Links to another origin open in a new tab so the review room stays open;
+relative, same-origin, and fragment links stay in place. A CommonMark link
+title, such as `[TLL-1](url "Title · status · priority")`, shows on hover, so
+put tracker context in the title when writing briefings. Fenced code blocks get
+a copy button; it is presentation-only chrome.
 
 Complete Markdown HTML comments are author-only source notes and do not appear
 on the rendered review surface. Raw HTML remains escaped except for native
