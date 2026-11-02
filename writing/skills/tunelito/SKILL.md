@@ -79,31 +79,49 @@ A folder shares **one** inbox: `site/` -> `site.comments.md`. Page-scoped
 comments appear only on their page; site-scoped comments appear on every page.
 If it is not installed, prefix with `npx --yes` (e.g. `npx --yes tunelito ./index.html`).
 
-Startup prints `Local:`, `Theme:`, `Comments:`, `Handoff:`, and `Access:`
-always, plus `Owner:`, `Agent:`, `Session:`, `Live:`, and `Public:` lines when
-those modes are active. An `Editing:` line also appears with `--editable`. Read
-them back and act on them:
+Startup prints a short header and aligned rows. `Local` and `Comments` always
+appear; `Access` (with `--no-auth`), `Editing` (with `--editable`), `Owner`,
+`Theme` (Markdown with a non-default theme), `Previews`, and `Agent` appear when
+those modes are active. With `--agent-session` (or `--verbose`) it also prints
+`Tracker`, `Record`, `Handoff`, and `Session` rows. `Public` prints last, once
+the tunnel resolves:
 
 ```text
-Local:    http://127.0.0.1:4317/?tunelito_key=...   # you, on this machine
-Theme:    bns-pitaya (default)                       # resolved Markdown presentation
-Comments: /path/to/index.html.comments.md           # where notes land
-Handoff:  tunelito review watch --url "..."          # optional batch-complete wait
-Access:   review key required by the printed URLs
-Editing:  direct local owner only; public links remain read-only
-Public:   https://<random>.trycloudflare.com/?tunelito_key=...   # share THIS
+tunelito <version> · index.html
+Keyed links · Ctrl-C to stop
+
+  Local      http://127.0.0.1:4317/?tunelito_key=...   you, on this machine
+  Comments   index.comments.md
+  Editing    on for the Local URL only; shared links stay read-only
+  Public     https://<random>.trycloudflare.com/?tunelito_key=...   share this
 ```
 
-A fresh Quick Tunnel can take up to about two minutes to route while DNS
-propagates. `Public:  waiting for DNS to propagate...` is progress, not
-failure: keep the process running and do not restart it or start a second
-tunnel. Share only the final keyed `Public:` URL. If verification times out,
-the message names the cause code (`ENOTFOUND`, a TLS error, `HTTP_<status>`,
-or `MISSING_MARKER`); report it rather than retrying in a loop.
+Paths print relative to the working directory. Do not scrape these rows for
+state. When you launch Tunelito in the background, add `--json`: stdout becomes
+one JSON object per line, and the share link arrives as
+`{"type":"tunnel","state":"ready","publicUrl":"..."}` (`tunelito help json`
+lists every event). From a second shell, `tunelito session status <target>
+--json` reports the same local URL, verified public URL, comments path, and
+tunnel state from `.tunelito/session.json`.
 
-`Public:` is the only shareable URL. `Live:` (printed with `--ephemeral`) is a
-**transport status line** ("WebRTC peer-to-peer when available; WebSocket relay
-fallback enabled"), not a URL -- never hand it to a reviewer.
+Removed in 1.0: `--out` (use `--comments`), `--live` (use `--ephemeral`), and
+`--owner-name` (use `--owner`). They now fail with a pointer to the replacement.
+
+A fresh Quick Tunnel can take up to about two minutes to route while DNS
+propagates. `Public     waiting for DNS on <host> (...)…` is progress, not
+failure: keep the process running and do not restart it or start a second
+tunnel. Share only the final keyed `Public` URL. If verification times out,
+the `Public     unavailable: ...` row names the cause code (`ENOTFOUND`, a TLS
+error, `HTTP_<status>`, or `MISSING_MARKER`); report it rather than retrying in
+a loop.
+
+`Public` is the only shareable URL. A `Sync` row (printed with `--ephemeral
+--verbose`) is a **transport status line**, not a URL -- never hand it to a
+reviewer.
+
+After startup, each comment, viewer change, source reload, and review handoff
+prints as one timestamped line (`14:03  comment  Ana: ...`). Ctrl-C prints a
+one-line summary with the session length and new-comment count.
 
 The printed review URL and `tunelito_key` stay valid for the lifetime of that
 server process. If the reviewer closes a tab, reopen the same URL instead of
@@ -112,12 +130,12 @@ restarting Tunelito and minting a new key.
 Defaults that matter: binds `127.0.0.1`, picks the first free port from `4317`,
 writes `<page-or-folder>.comments.md` beside the source. Useful tweaks (all
 optional): `--port <n>` if 4317 is taken, `--host <host>` to change the bind,
-`--out <path>` to redirect the inbox, `--markdown-css <href>` to add team styling
+`--comments <path>` to redirect the inbox, `--markdown-css <href>` to add team styling
 to rendered Markdown pages, `--open` to launch the Local URL,
 `--owner <name>` to seed the direct local owner's display name, and `--editable`
 to let that owner edit safely served Markdown source in the browser. Comments made
-through the loopback `Local:` URL are tagged with `author role: owner`; comments
-made through the `Public:` tunnel URL are visitors.
+through the loopback `Local` URL are tagged with `author role: owner`; comments
+made through the `Public` tunnel URL are visitors.
 
 Markdown documents and generated folder pages use dark-only `bns-pitaya` when
 no CLI, project, or global theme is configured. If presentation matters, inspect
@@ -126,6 +144,10 @@ the resolved layers before serving:
 ```bash
 tunelito config show ./notes.md
 ```
+
+With nothing configured it reports `Theme   bns-pitaya   default`.
+Startup prints a `Theme` row only when a CLI, project, or global setting picks
+the theme (or with `--verbose`).
 
 Use `--theme default` for Tunelito's neutral light/dark surface. CLI flags
 override project config, which overrides global config and then built-in
@@ -151,7 +173,9 @@ Links to another origin open in a new tab so the review room stays open;
 relative, same-origin, and fragment links stay in place. A CommonMark link
 title, such as `[TLL-1](url "Title · status · priority")`, shows on hover, so
 put tracker context in the title when writing briefings. Fenced code blocks get
-a copy button; it is presentation-only chrome.
+a copy button and a wrap toggle; both are presentation-only chrome. Long code
+lines wrap by default, so prompts in code blocks read without scrolling; pass
+`--no-code-wrap` (or set `"codeWrap": false`) when alignment matters.
 
 For bare tracker links, a resolver can fill the hover card instead:
 `--link-preview '<regex>' '<json-url-template>'` (optionally
@@ -183,7 +207,7 @@ card.
 
 ### Local Markdown source editing
 
-Use `--editable` only when the person at the direct loopback `Local:` URL should
+Use `--editable` only when the person at the direct loopback `Local` URL should
 be able to change the Markdown source from its rendered review page:
 
 ```bash
@@ -207,7 +231,7 @@ source-edit authority. Keep using the public URL for view + comment review.
 
 ## Step 2 -- Share it safely
 
-Hand the reviewer the **`Public:`** URL, not the `Local:` one (`127.0.0.1` is
+Hand the reviewer the **`Public`** URL, not the `Local` one (`127.0.0.1` is
 unreachable for a remote person). Then tell them the one thing that matters:
 
 > The link contains a `tunelito_key`. It is **bearer access** -- anyone who has
@@ -216,7 +240,7 @@ unreachable for a remote person). Then tell them the one thing that matters:
 > only in a trusted channel and stop the session when the review is done.
 
 Owner status is assigned by the server from how the browser reached Tunelito:
-the direct loopback `Local:` URL is owner, while public tunnel or forwarded
+the direct loopback `Local` URL is owner, while public tunnel or forwarded
 URLs are visitors. `--owner` only seeds the editable owner display name; do not
 present it as account authentication.
 
@@ -237,7 +261,7 @@ machine, do not open a tunnel:
 tunelito ./report.html --no-tunnel --open
 ```
 
-`--no-tunnel` prints only the `Local:` URL and never starts the Cloudflare
+`--no-tunnel` prints only the `Local` URL and never starts the Cloudflare
 Tunnel, so the session stays on `127.0.0.1` with no public exposure. This is the
 flag that controls exposure -- not `--no-auth`, and not `--ephemeral`.
 
@@ -416,7 +440,7 @@ notes, or notes containing the trigger) is the safe default for a shared call. T
 silently fall through.
 
 Watch the owner-gating trap: a person counts as the **owner** for policy only
-from the direct loopback `Local:` URL. If the user reviews via the **`Public:`**
+from the direct loopback `Local` URL. If the user reviews via the **`Public`**
 link they are seen as a visitor, so `owner` and `owner-or-mention` will silently
 never match their comments unless the direct local owner approves the comment.
 When you set up "only I can trigger edits," either have the user open the Local URL,
@@ -471,7 +495,7 @@ are Tunelito's data store and ledger, not your edit targets.
 
 ## Step 4 -- Wrap up
 
-- Tell the user where comments landed (the `Comments:` path) and which files you
+- Tell the user where comments landed (the `Comments` row) and which files you
   changed, keyed by comment id.
 - If a session is still running, stop it (Ctrl-C) when the review is done so the
   bearer URL dies. (When you only processed an inbox in 3c, there is no server
@@ -525,8 +549,8 @@ are Tunelito's data store and ledger, not your edit targets.
 
 | Anti-pattern | Why it bites |
 | --- | --- |
-| Sharing the `Local:` URL instead of `Public:` | `127.0.0.1` is unreachable for the remote reviewer; they see nothing. |
-| Sharing the `Live:` line as a link | It is a transport status string, not a URL; the reviewer still needs the `Public:` URL. |
+| Sharing the `Local` URL instead of `Public` | `127.0.0.1` is unreachable for the remote reviewer; they see nothing. |
+| Sharing the `Sync` row as a link | It is a transport status string, not a URL; the reviewer still needs the `Public` URL. |
 | Treating the keyed URL as private or "authenticated per person" | It is a shared bearer token -- forwarding it hands over full view + comment rights. |
 | `--no-auth` without `--no-tunnel` | Publishes an ungated public URL anyone can open and comment on; `--no-auth` does not disable the tunnel. |
 | Assuming the key or `--no-auth` grants source editing | `--editable` is enforced separately and only for the direct loopback owner; public and forwarded requests stay read-only. |
@@ -534,7 +558,7 @@ are Tunelito's data store and ledger, not your edit targets.
 | Tunneling a page with sensitive/client data | A public URL exposes the data; use `--no-tunnel`. |
 | `--agent --agent-policy all` on a shared call | Any guest comment becomes a local code-edit instruction; scope to owner/mention. |
 | Spawning `--agent` from inside an existing agent session | Creates a nested agent and hides the loop; use `--agent-session` so the serving process watches comments for the current session. |
-| Promising owner-only edits while the owner uses the `Public:` link | Owner policy only matches the direct loopback `Local:` session; via the public link they count as a visitor and never match. |
+| Promising owner-only edits while the owner uses the `Public` link | Owner policy only matches the direct loopback `Local` session; via the public link they count as a visitor and never match. |
 | `mention`/`owner-or-mention` with `--agent-trigger all` | The server refuses to start -- these policies require a real trigger marker. |
 | Using `--ephemeral` then expecting a record | Nothing is written to disk; the comments are gone on restart, and `--agent` won't run. |
 | Inventing `session persist` for an ephemeral review | Tunelito cannot promote or transfer the in-memory comments; explain the loss boundary and restart in persistent mode only with the user's choice. |
@@ -565,8 +589,8 @@ this version" -- the note is not lost, only its anchor.
 
 | Goal | Command |
 | --- | --- |
-| Share a page on a call | `tunelito ./index.html` -> share the `Public:` URL |
-| Share a Markdown memo on a call | `tunelito ./notes.md` -> share the `Public:` URL |
+| Share a page on a call | `tunelito ./index.html` -> share the `Public` URL |
+| Share a Markdown memo on a call | `tunelito ./notes.md` -> share the `Public` URL |
 | Edit Markdown from the local review page | `tunelito ./notes.md --editable --no-tunnel --open` |
 | Share a folder mini-site | `tunelito ./site` (one `site.comments.md` inbox) |
 | Inspect resolved presentation | `tunelito config show ./notes.md` |
@@ -612,7 +636,7 @@ custom` requires it. The custom command receives these env vars:
   comments, or any comment containing the trigger.
 
 A comment is "owner"-authored only when it was left from the direct loopback
-`Local:` URL. If the owner reviews via the `Public:` link they count as a
+`Local` URL. If the owner reviews via the `Public` link they count as a
 visitor, so `owner` and `owner-or-mention` will not match their notes unless the
 direct local owner approves the comment. Rely on the trigger marker for them, or
 have them open the Local URL.
