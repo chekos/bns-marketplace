@@ -79,7 +79,8 @@ A folder shares **one** inbox: `site/` -> `site.comments.md`. Page-scoped
 comments appear only on their page; site-scoped comments appear on every page.
 If it is not installed, prefix with `npx --yes` (e.g. `npx --yes tunelito ./index.html`).
 
-Startup prints a short header and aligned rows. `Local` and `Comments` always
+In CLI contract v2 (Tunelito 2.0), human serve output goes to stderr. Startup
+prints a short header and aligned rows. `Local` and `Comments` always
 appear; `Access` (with `--no-auth`), `Editing` (with `--editable`), `Owner`,
 `Theme` (Markdown with a non-default theme), `Previews`, and `Agent` appear when
 those modes are active. With `--agent-session` (or `--verbose`) it also prints
@@ -104,6 +105,16 @@ lists every event). From a second shell, `tunelito session status <target>
 --json` reports the same local URL, verified public URL, comments path, and
 tunnel state from `.tunelito/session.json`.
 
+Machine failures write one `tunelito-error` JSON object on stderr with
+`schemaVersion: 2`, a stable `code`, `message`, `exitCode`, and `recovery`
+commands. Parse stderr separately from stdout; never merge it into the JSONL
+event consumer. Already-emitted serve events stay on stdout. `--json` selects
+machine output even on a TTY; `--format=json` is equivalent. Human presentation
+supports `--plain` / `--format=plain` (no color or redraws) and `--no-color`.
+Global flags work before or after a command path, `--option=value` is accepted,
+and `--` preserves literal paths. `tunelito help inbox record --json` returns
+command and option metadata without starting a server.
+
 Removed in 1.0: `--out` (use `--comments`), `--live` (use `--ephemeral`), and
 `--owner-name` (use `--owner`). They now fail with a pointer to the replacement.
 
@@ -121,7 +132,15 @@ reviewer.
 
 After startup, each comment, viewer change, source reload, and review handoff
 prints as one timestamped line (`14:03  comment  Ana: ...`). Ctrl-C prints a
-one-line summary with the session length and new-comment count.
+one-line summary with the session length and new-comment count. SIGINT exits
+130, SIGTERM 143, and SIGHUP 129; these are intentional cancellations, not a
+successful exit as in 1.x. Allow five seconds for local cleanup and output
+drain. A second signal forces immediate exit and may omit the final summary.
+Normal JSON cleanup ends with a `stopped` event carrying `signal`, `exitCode`,
+and `cleanup`; cancellation is a structured stderr error. Stopping a local
+provider CLI does not confirm that previously submitted remote work stopped.
+Human rendering escapes terminal controls without rewriting stored comments
+or machine JSON values. Pin `tunelito@1` while migrating an older integration.
 
 The printed review URL and `tunelito_key` stay valid for the lifetime of that
 server process. If the reviewer closes a tab, reopen the same URL instead of
@@ -149,7 +168,11 @@ With nothing configured it reports `Theme   bns-pitaya   default`.
 Startup prints a `Theme` row only when a CLI, project, or global setting picks
 the theme (or with `--verbose`).
 
-Use `--theme default` for Tunelito's neutral light/dark surface. CLI flags
+Use `--theme default` for Tunelito's neutral light/dark surface. For a
+screenplay written as Markdown, use `--theme screenplay` and follow
+`docs/spec/screenplay-markdown-v1.md`: `##` sluglines, `###` beats, `####`
+transitions, plain paragraphs for action, and one blockquote per dialogue turn
+(`> **CUE**`, a `>`-only line, then dialogue; parentheticals as `> *(...)*`). CLI flags
 override project config, which overrides global config and then built-in
 defaults. `config show` is read-only; do not create or edit
 `tunelito.config.json` merely to start a review unless the user asked to persist
